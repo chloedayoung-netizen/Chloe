@@ -52,9 +52,12 @@ cp .env.example .env   # 값 채우기
    API* 활성화 후 API 키 발급 → `GOOGLE_API_KEY`
    - 무료 한도: 하루 100 쿼리
 
-### OpenAI
-- API 키 발급 → `OPENAI_API_KEY`
-- Structured Outputs 지원 모델 사용 (기본 `gpt-4o-2024-08-06`) → `OPENAI_MODEL`
+### LLM (OpenRouter, OpenAI 호환)
+- [OpenRouter](https://openrouter.ai/keys) 에서 API 키 발급 → `OPENROUTER_API_KEY`
+- 엔드포인트는 기본값(`OPENROUTER_BASE_URL=https://openrouter.ai/api/v1`)을 그대로 사용
+- Structured Outputs(json_schema)를 지원하는 모델 사용 → `OPENROUTER_MODEL`
+  (기본 `openai/gpt-4o-2024-08-06`)
+- OpenAI Python SDK 를 그대로 쓰되 `base_url` 만 OpenRouter 로 지정합니다.
 
 ### Google Sheets
 1. Cloud Console 에서 *Google Sheets API* 활성화
@@ -74,7 +77,7 @@ cp .env.example .env   # 값 채우기
 ## 4. 실행
 
 ```bash
-# 저장 없이 추출 결과만 확인 (시트/서비스계정 불필요, 검색·OpenAI 키만 필요)
+# 저장 없이 추출 결과만 확인 (시트/서비스계정 불필요, 검색·OpenRouter 키만 필요)
 python main.py --dry-run
 
 # 실제 실행: Google Sheets 에 저장

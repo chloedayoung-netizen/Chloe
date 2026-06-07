@@ -16,8 +16,9 @@ class Env:
 
     google_api_key: str
     google_cse_id: str
-    openai_api_key: str
-    openai_model: str
+    llm_api_key: str
+    llm_base_url: str
+    llm_model: str
     service_account_file: str
     sheet_id: str
     sheet_tab: str
@@ -27,7 +28,9 @@ class Env:
         """환경변수를 로딩한다.
 
         require_sheets=False 이면 Google Sheets 관련 자격증명을 필수로 보지
-        않는다. (예: --dry-run 모드에서는 검색/OpenAI 키만 있어도 동작)
+        않는다. (예: --dry-run 모드에서는 검색/LLM 키만 있어도 동작)
+
+        LLM 은 OpenAI 호환 API(기본값: OpenRouter)를 사용한다.
         """
         load_dotenv()
         missing = []
@@ -41,8 +44,11 @@ class Env:
         env = cls(
             google_api_key=req("GOOGLE_API_KEY"),
             google_cse_id=req("GOOGLE_CSE_ID"),
-            openai_api_key=req("OPENAI_API_KEY"),
-            openai_model=os.getenv("OPENAI_MODEL", "gpt-4o-2024-08-06").strip(),
+            llm_api_key=req("OPENROUTER_API_KEY"),
+            llm_base_url=os.getenv(
+                "OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"
+            ).strip(),
+            llm_model=os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-2024-08-06").strip(),
             service_account_file=req("GOOGLE_SERVICE_ACCOUNT_FILE", require_sheets),
             sheet_id=req("GOOGLE_SHEET_ID", require_sheets),
             sheet_tab=os.getenv("GOOGLE_SHEET_TAB", "buyers").strip(),

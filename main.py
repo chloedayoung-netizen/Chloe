@@ -35,7 +35,8 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
     fetch_opts = cfg.fetch
     extract_opts = cfg.extract
 
-    openai_client = OpenAI(api_key=env.openai_api_key)
+    # OpenAI 호환 클라이언트로 OpenRouter 에 접속
+    openai_client = OpenAI(api_key=env.llm_api_key, base_url=env.llm_base_url)
 
     # --- Sheets 준비 (dry-run 이면 건너뜀) ---
     sheet: SheetClient | None = None
@@ -99,7 +100,7 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
 
         record = extract(
             openai_client,
-            env.openai_model,
+            env.llm_model,
             result.text,
             source_url=hit.url,
             country_hint=hit.country,
