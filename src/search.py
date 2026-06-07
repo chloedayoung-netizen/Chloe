@@ -1,4 +1,8 @@
-"""Google Programmable Search JSON API 래퍼."""
+"""Serper.dev (Google 검색 결과) API 래퍼.
+
+Google Programmable Search 의 무료 전체 웹 검색이 중단됨에 따라, 전체 웹
+검색이 가능한 Serper.dev 를 사용한다. (https://serper.dev)
+"""
 from __future__ import annotations
 
 import logging
@@ -9,7 +13,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger(__name__)
 
-SEARCH_ENDPOINT = "https://www.googleapis.com/customsearch/v1"
+SEARCH_ENDPOINT = "https://google.serper.dev/search"
 
 
 @dataclass
@@ -23,54 +27,55 @@ class SearchHit:
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-def _call(params: dict) -> dict:
-    resp = requests.get(SEARCH_ENDPOINT, params=params, timeout=20)
+def _call(api_key: str, payload: dict) -> dict:
+    resp = requests.post(
+        SEARCH_ENDPOINT,
+        headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
+        json=payload,
+        timeout=20,
+    )
     resp.raise_for_status()
     return resp.json()
 
 
 def search(
     api_key: str,
-    cse_id: str,
     query: str,
     country: str,
     category: str,
     num_results: int = 10,
-    language: str | None = None,
+    gl: str | None = None,
+    hl: str | None = None,
 ) -> list[SearchHit]:
-    """단일 쿼리 검색. API 한 번에 최대 10건이라 페이지네이션으로 채운다."""
-    hits: list[SearchHit] = []
-    start = 1
-    while len(hits) < num_results and start <= 91:
-        page_size = min(10, num_results - len(hits))
-        params = {
-            "key": api_key,
-            "cx": cse_id,
-            "q": query,
-            "num": page_size,
-            "start": start,
-        }
-        if language:
-            params["lr"] = language
-        try:
-            data = _call(params)
-        except Exception as exc:  # noqa: BLE001
-            logger.warning("검색 실패 (query=%r): %s", query, exc)
-            break
+    """단일 쿼리 검색. Serper 는 한 번에 최대 100건까지 반환한다.
 
-        items = data.get("items", [])
-        if not items:
-            break
-        for item in items:
-            hits.append(
-                SearchHit(
-                    url=item.get("link", ""),
-                    title=item.get("title", ""),
-                    snippet=item.get("snippet", ""),
-                    query=query,
-                    country=country,
-                    category=category,
-                )
+    gl: 국가 코드(예: "fr", "jp"), hl: 언어 코드(예: "en"). 선택값.
+    """
+    payload: dict = {"q": query, "num": min(num_results, 100)}
+    if gl:
+        payload["gl"] = gl
+    if hl:
+        payload["hl"] = hl
+
+    try:
+        data = _call(api_key, payload)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("검색 실패 (query=%r): %s", query, exc)
+        return []
+
+    hits: list[SearchHit] = []
+    for item in data.get("organic", [])[:num_results]:
+        url = item.get("link", "")
+        if not url:
+            continue
+        hits.append(
+            SearchHit(
+                url=url,
+                title=item.get("title", ""),
+                snippet=item.get("snippet", ""),
+                query=query,
+                country=country,
+                category=category,
             )
-        start += page_size
+        )
     return hits

@@ -14,8 +14,7 @@ from dotenv import load_dotenv
 class Env:
     """.env 에서 읽는 비밀/연결 정보."""
 
-    google_api_key: str
-    google_cse_id: str
+    serper_api_key: str
     llm_api_key: str
     llm_base_url: str
     llm_model: str
@@ -42,8 +41,7 @@ class Env:
             return val
 
         env = cls(
-            google_api_key=req("GOOGLE_API_KEY"),
-            google_cse_id=req("GOOGLE_CSE_ID"),
+            serper_api_key=req("SERPER_API_KEY"),
             llm_api_key=req("OPENROUTER_API_KEY"),
             llm_base_url=os.getenv(
                 "OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"

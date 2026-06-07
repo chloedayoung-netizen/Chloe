@@ -21,10 +21,11 @@ categories:
   - "womenswear"
   - "home fragrance"
 
-# 검색 옵션
+# 검색 옵션 (Serper.dev / Google 결과)
 search:
-  results_per_query: 10        # 쿼리당 가져올 결과 수 (Google API 최대 10/요청)
-  language: "lang_en"          # lr 파라미터 (예: lang_en, lang_ja, lang_fr)
+  results_per_query: 10        # 쿼리당 가져올 결과 수 (Serper 최대 100/요청)
+  language: "en"               # hl: 언어 코드 (예: en, ja, fr). 비우면 기본값
+  # country_code: "fr"         # gl: 국가 코드(선택). 보통 쿼리에 국가명이 들어가므로 생략 가능
   max_total_urls: 60           # 이번 실행에서 처리할 최대 URL 수 (안전 상한)
 
 # HTML 수집 옵션

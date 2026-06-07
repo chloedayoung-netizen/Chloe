@@ -5,7 +5,7 @@ Clay 없이 해외 바이어(편집숍/셀렉트숍/부티크 등) 후보를 찾
 문장**을 추출해 **Google Sheets**에 저장하는 파이프라인입니다.
 
 ```
-Google Programmable Search  →  HTML 수집(BeautifulSoup)  →
+웹 검색(Serper.dev)  →  HTML 수집(BeautifulSoup)  →
 OpenAI Structured Outputs(스키마 검증)  →  Google Sheets append(중복 제외)
 ```
 
@@ -26,7 +26,7 @@ Chloe/
 └── src/
     ├── __init__.py
     ├── config.py        # .env + config.yaml 로딩, 쿼리 확장
-    ├── search.py        # Google Programmable Search JSON API
+    ├── search.py        # Serper.dev (Google 결과) 검색 API
     ├── fetcher.py       # HTML 수집 + 접근불가/로그인/SNS 스킵
     ├── schema.py        # 추출 JSON Schema (Structured Outputs)
     ├── extractor.py     # OpenAI 추출 + 스키마 검증
@@ -45,12 +45,14 @@ cp .env.example .env   # 값 채우기
 
 ## 2. API 준비
 
-### Google Programmable Search JSON API
-1. [Programmable Search Engine](https://programmablesearchengine.google.com/) 에서
-   검색엔진을 만들고 **Search engine ID(cx)** 를 복사 → `GOOGLE_CSE_ID`
-2. [Google Cloud Console](https://console.cloud.google.com/) 에서 *Custom Search
-   API* 활성화 후 API 키 발급 → `GOOGLE_API_KEY`
-   - 무료 한도: 하루 100 쿼리
+### 웹 검색 (Serper.dev)
+> 참고: Google Programmable Search 의 무료 전체 웹 검색이 2027년 중단 예정으로,
+> 신규 엔진은 사이트 50개로 제한됩니다. 그래서 전체 웹 검색이 가능한
+> Serper.dev(Google 결과) 를 사용합니다.
+
+1. [serper.dev](https://serper.dev) 가입 (구글 계정 가능)
+2. 대시보드에서 **API Key** 발급 → `SERPER_API_KEY`
+   - 가입 시 무료 크레딧(약 2,500 검색) 제공
 
 ### LLM (OpenRouter, OpenAI 호환)
 - [OpenRouter](https://openrouter.ai/keys) 에서 API 키 발급 → `OPENROUTER_API_KEY`
@@ -121,7 +123,7 @@ python main.py --config config.yaml
 | # | 요구사항 | 구현 위치 |
 |---|----------|-----------|
 | 1 | 검색어/국가/카테고리 설정 | `config.yaml`, `src/config.py` |
-| 2 | Programmable Search 결과 수집 | `src/search.py` |
+| 2 | 웹 검색 결과 수집 (Serper.dev) | `src/search.py` |
 | 3 | 접근불가/로그인/에러 페이지 스킵 | `src/fetcher.py` |
 | 4 | 회사/국가/카테고리/브랜드/신호/근거/메일첫문장 추출 | `src/extractor.py`, `src/schema.py` |
 | 5 | JSON Schema 검증 | `src/schema.py`, `extractor._validate` |
@@ -139,7 +141,7 @@ python main.py --config config.yaml
   해당 도메인은 `config.yaml > fetch.blocked_domains` 로 차단됩니다.
 - 각 사이트의 `robots.txt` 및 이용약관을 준수해 사용하세요.
 - JavaScript 렌더링이 필요한 SPA 는 본문이 비어 스킵될 수 있습니다 (MVP 범위 외).
-- Google 검색 무료 한도(하루 100 쿼리)에 유의하세요. `config.yaml` 의
+- Serper.dev 무료 크레딧 소진에 유의하세요. `config.yaml` 의
   `search.max_total_urls` 로 1회 실행량을 제한할 수 있습니다.
 - `evidence_text` 는 모델에 "본문에서 그대로 인용"하도록 지시하지만, LLM 특성상
   완전 일치를 보장하진 않습니다. 검수 단계(`status`)에서 확인하세요.

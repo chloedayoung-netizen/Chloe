@@ -53,7 +53,8 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
 
     max_total = int(search_opts.get("max_total_urls", 60))
     per_query = int(search_opts.get("results_per_query", 10))
-    language = search_opts.get("language")
+    hl = search_opts.get("language")  # 언어 코드 (예: "en")
+    gl = search_opts.get("country_code")  # 국가 코드 (예: "fr"), 선택값
 
     seen_this_run: set[str] = set()
     candidates: list[search.SearchHit] = []
@@ -61,13 +62,13 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
         if len(candidates) >= max_total:
             break
         hits = search.search(
-            env.google_api_key,
-            env.google_cse_id,
+            env.serper_api_key,
             query,
             country,
             category,
             num_results=per_query,
-            language=language,
+            gl=gl,
+            hl=hl,
         )
         for hit in hits:
             url = hit.url.strip()
