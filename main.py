@@ -28,7 +28,7 @@ logger = logging.getLogger("buyer-research")
 
 
 def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
-    env = Env.load()
+    env = Env.load(require_sheets=not dry_run)
     cfg = Config.load(config_path)
 
     search_opts = cfg.search

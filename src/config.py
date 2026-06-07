@@ -23,13 +23,18 @@ class Env:
     sheet_tab: str
 
     @classmethod
-    def load(cls) -> "Env":
+    def load(cls, require_sheets: bool = True) -> "Env":
+        """환경변수를 로딩한다.
+
+        require_sheets=False 이면 Google Sheets 관련 자격증명을 필수로 보지
+        않는다. (예: --dry-run 모드에서는 검색/OpenAI 키만 있어도 동작)
+        """
         load_dotenv()
         missing = []
 
-        def req(key: str) -> str:
+        def req(key: str, required: bool = True) -> str:
             val = os.getenv(key, "").strip()
-            if not val:
+            if not val and required:
                 missing.append(key)
             return val
 
@@ -38,8 +43,8 @@ class Env:
             google_cse_id=req("GOOGLE_CSE_ID"),
             openai_api_key=req("OPENAI_API_KEY"),
             openai_model=os.getenv("OPENAI_MODEL", "gpt-4o-2024-08-06").strip(),
-            service_account_file=req("GOOGLE_SERVICE_ACCOUNT_FILE"),
-            sheet_id=req("GOOGLE_SHEET_ID"),
+            service_account_file=req("GOOGLE_SERVICE_ACCOUNT_FILE", require_sheets),
+            sheet_id=req("GOOGLE_SHEET_ID", require_sheets),
             sheet_tab=os.getenv("GOOGLE_SHEET_TAB", "buyers").strip(),
         )
         if missing:
