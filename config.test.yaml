@@ -1,0 +1,35 @@
+# 빠른 연결 테스트용 축소 설정 (크레딧 절약)
+queries:
+  - '{category} concept store stockists {country}'
+
+countries:
+  - "France"
+
+categories:
+  - "home fragrance"
+
+search:
+  results_per_query: 5
+  language: "en"
+  max_total_urls: 3
+
+fetch:
+  timeout_seconds: 15
+  max_content_chars: 8000
+  user_agent: "Mozilla/5.0 (compatible; BuyerResearchBot/1.0; +https://example.com/bot)"
+  blocked_domains:
+    - "linkedin.com"
+    - "instagram.com"
+    - "facebook.com"
+    - "twitter.com"
+    - "x.com"
+    - "tiktok.com"
+    - "pinterest.com"
+    - "youtube.com"
+
+extract:
+  temperature: 0
+  our_brand_context: >
+    We are a Korean independent fragrance & lifestyle brand looking for
+    overseas wholesale/stockist partners (concept stores, select shops,
+    boutiques) who carry niche international brands.

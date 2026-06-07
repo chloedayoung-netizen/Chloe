@@ -17,7 +17,9 @@ from openai import OpenAI
 from src import fetcher, search
 from src.config import Config, Env
 from src.extractor import extract
-from src.sheets import SheetClient
+
+# 주의: src.sheets 는 Google 라이브러리에 의존하므로, 실제 저장(비 dry-run)
+# 시점에 지연 import 한다. → dry-run 은 Sheets 의존성 없이도 동작.
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,9 +41,11 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
     openai_client = OpenAI(api_key=env.llm_api_key, base_url=env.llm_base_url)
 
     # --- Sheets 준비 (dry-run 이면 건너뜀) ---
-    sheet: SheetClient | None = None
+    sheet = None
     existing: set[str] = set()
     if not dry_run:
+        from src.sheets import SheetClient  # 지연 import (Google 라이브러리)
+
         sheet = SheetClient(env.service_account_file, env.sheet_id, env.sheet_tab)
         sheet.ensure_header()
         existing = sheet.existing_urls()
