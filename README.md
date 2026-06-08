@@ -96,6 +96,10 @@ python main.py --backfill-contacts
 # 해외 유통사/에이전시 모드 — 별도 config + 별도 탭에 저장 (바이어와 분리)
 # (맥에서는 run_distributors.command 더블클릭)
 python main.py --config config.distributors.yaml --tab distributors
+
+# 한국 아마존 셀러 모드 — 아마존에 판매 중인 한국 회사 공식사이트/연락처
+# (맥에서는 run_amazon_kr.command 더블클릭)
+python main.py --config config.amazon-kr.yaml --tab amazon_kr
 ```
 
 ### 다른 타깃으로 확장하기 (config 파일만 추가)
