@@ -29,6 +29,10 @@ fi
 cp -f "$SRC/main.py" .
 cp -f "$SRC/requirements.txt" .
 cp -f "$SRC/run.command" . 2>/dev/null
+cp -f "$SRC/update.command" . 2>/dev/null
+cp -f "$SRC/schedule_install.command" . 2>/dev/null
+cp -f "$SRC/schedule_remove.command" . 2>/dev/null
+chmod +x ./*.command 2>/dev/null
 rm -rf src && cp -Rf "$SRC/src" .
 rm -rf "$TMP"
 
