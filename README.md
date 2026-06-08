@@ -92,7 +92,20 @@ python main.py --config config.yaml
 # 이미 저장된 행 중 연락처가 빈 곳만 다시 방문해 이메일/인스타 채우기
 # (검색·AI 추출 없음 → 비용 0. 맥에서는 backfill_contacts.command 더블클릭)
 python main.py --backfill-contacts
+
+# 해외 유통사/에이전시 모드 — 별도 config + 별도 탭에 저장 (바이어와 분리)
+# (맥에서는 run_distributors.command 더블클릭)
+python main.py --config config.distributors.yaml --tab distributors
 ```
+
+### 다른 타깃으로 확장하기 (config 파일만 추가)
+
+동일한 엔진으로 "무엇을 찾을지"는 config 파일로 바꿉니다. 핵심은 `extract.target_definition` —
+이 문장이 LLM 의 적합 여부(`is_relevant_buyer`) 판단 기준이 됩니다.
+
+- `--config <파일>` : 검색어/국가/카테고리/타깃정의를 통째로 교체
+- `--tab <이름>` : 결과를 다른 시트 탭에 저장(섞이지 않게 분리)
+- `config.yaml`(기본) 만 시트의 `config` 탭에서 편집 가능, 다른 모드는 YAML 직접 편집
 
 ---
 

@@ -12,20 +12,30 @@ from .schema import BUYER_SCHEMA
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT = (
-    "You are a B2B export sales researcher. From the given web page text of a "
-    "potential overseas retail buyer, extract structured information. "
-    "Only use facts present in the page text. Do NOT invent brands, signals, "
-    "or quotes. The evidence_text MUST be a verbatim sentence copied from the "
-    "page text. A real buyer is a store/retailer/boutique/concept store that "
-    "could stock and sell our products. Set is_relevant_buyer to FALSE for "
-    "anything that is NOT itself a store, including: news articles, magazines, "
-    "press releases, blog posts, reviews, marketplaces or wholesale platforms "
-    "(Amazon, Etsy, Faire, Ankorstore, etc.), brand-listing or directory pages, "
-    "social media, wikis, and forums. "
-    "The personalized_opener must be a single natural English sentence that "
-    "references something specific about this buyer."
+# 기본 타깃 정의 (config 에 target_definition 이 없으면 이 값을 쓴다 → 기존 바이어 동작 유지)
+DEFAULT_TARGET = (
+    "A real buyer is a store/retailer/boutique/concept store that could stock "
+    "and sell our products. Set is_relevant_buyer to FALSE for anything that is "
+    "NOT itself a store, including: news articles, magazines, press releases, "
+    "blog posts, reviews, marketplaces or wholesale platforms (Amazon, Etsy, "
+    "Faire, Ankorstore, etc.), brand-listing or directory pages, social media, "
+    "wikis, and forums."
 )
+
+
+def _build_system_prompt(target_definition: str) -> str:
+    """타깃 정의를 끼워 넣어 system 프롬프트를 만든다."""
+    target = (target_definition or DEFAULT_TARGET).strip()
+    return (
+        "You are a B2B export sales researcher. From the given web page text, "
+        "extract structured information about the company/page. "
+        "Only use facts present in the page text. Do NOT invent brands, signals, "
+        "or quotes. The evidence_text MUST be a verbatim sentence copied from the "
+        "page text.\n\n"
+        f"TARGET DEFINITION — set is_relevant_buyer to TRUE only if the page matches:\n{target}\n\n"
+        "The personalized_opener must be a single natural English sentence that "
+        "references something specific about this company."
+    )
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
@@ -48,12 +58,15 @@ def extract(
     country_hint: str = "",
     category_hint: str = "",
     our_brand_context: str = "",
+    target_definition: str = "",
     temperature: float = 0.0,
 ) -> dict[str, Any] | None:
-    """페이지 텍스트에서 구조화된 바이어 정보를 추출.
+    """페이지 텍스트에서 구조화된 바이어/타깃 정보를 추출.
 
+    target_definition 으로 "무엇을 적합한 타깃으로 볼지"를 바꿀 수 있다.
     실패하거나 스키마 검증에 실패하면 None 반환.
     """
+    system_prompt = _build_system_prompt(target_definition)
     user_content = (
         f"OUR BRAND CONTEXT:\n{our_brand_context}\n\n"
         f"SEARCH HINTS — country: {country_hint or 'unknown'}, "
@@ -62,7 +75,7 @@ def extract(
         f"PAGE TEXT:\n{page_text}"
     )
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_content},
     ]
     try:

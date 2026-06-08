@@ -29,7 +29,12 @@ logging.basicConfig(
 logger = logging.getLogger("buyer-research")
 
 
-def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
+def run(
+    config_path: str = "config.yaml",
+    dry_run: bool = False,
+    sheet_tab: str | None = None,
+    use_sheet_config: bool = True,
+) -> None:
     env = Env.load(require_sheets=not dry_run)
     cfg = Config.load(config_path)
 
@@ -45,38 +50,49 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
     if not dry_run:
         from src.sheets import SheetClient  # 지연 import (Google 라이브러리)
 
-        sheet = SheetClient(env.service_account_file, env.sheet_id, env.sheet_tab)
+        tab = sheet_tab or env.sheet_tab
+        sheet = SheetClient(env.service_account_file, env.sheet_id, tab)
         sheet.ensure_header()
         existing = sheet.existing_urls()
         logger.info("시트에 이미 저장된 URL: %d개", len(existing))
 
         # 설정(config) 탭: 없으면 config.yaml 값으로 채우고, 있으면 그 값으로 덮어쓴다.
         # → 사용자는 터미널 대신 구글 시트에서 나라/카테고리/검색어를 바꿀 수 있다.
-        sheet.ensure_config_tab(
-            {
-                "countries": cfg.countries,
-                "categories": cfg.categories,
-                "queries": cfg.queries,
-                "max_total_urls": cfg.search.get("max_total_urls", 30),
-                "language": cfg.search.get("language", "en"),
-            }
-        )
-        sheet_cfg = sheet.read_config()
-        if sheet_cfg.get("countries"):
-            cfg.countries = sheet_cfg["countries"]
-        if sheet_cfg.get("categories"):
-            cfg.categories = sheet_cfg["categories"]
-        if sheet_cfg.get("queries"):
-            cfg.queries = sheet_cfg["queries"]
-        if sheet_cfg.get("max_total_urls"):
-            cfg.search["max_total_urls"] = sheet_cfg["max_total_urls"]
-        if sheet_cfg.get("language"):
-            cfg.search["language"] = sheet_cfg["language"]
-        logger.info(
-            "설정 적용: %d개국 × %d개 카테고리 (시트 config 탭 우선)",
-            len(cfg.countries),
-            len(cfg.categories),
-        )
+        # 단, 바이어 기본 모드에서만 사용한다. (다른 모드는 시트의 바이어 설정에
+        #  덮어써지면 안 되므로 YAML 을 그대로 쓴다.)
+        if use_sheet_config:
+            sheet.ensure_config_tab(
+                {
+                    "countries": cfg.countries,
+                    "categories": cfg.categories,
+                    "queries": cfg.queries,
+                    "max_total_urls": cfg.search.get("max_total_urls", 30),
+                    "language": cfg.search.get("language", "en"),
+                }
+            )
+            sheet_cfg = sheet.read_config()
+            if sheet_cfg.get("countries"):
+                cfg.countries = sheet_cfg["countries"]
+            if sheet_cfg.get("categories"):
+                cfg.categories = sheet_cfg["categories"]
+            if sheet_cfg.get("queries"):
+                cfg.queries = sheet_cfg["queries"]
+            if sheet_cfg.get("max_total_urls"):
+                cfg.search["max_total_urls"] = sheet_cfg["max_total_urls"]
+            if sheet_cfg.get("language"):
+                cfg.search["language"] = sheet_cfg["language"]
+            logger.info(
+                "설정 적용: %d개국 × %d개 카테고리 (시트 config 탭 우선)",
+                len(cfg.countries),
+                len(cfg.categories),
+            )
+        else:
+            logger.info(
+                "설정 적용: %d개국 × %d개 카테고리 (YAML: %s)",
+                len(cfg.countries),
+                len(cfg.categories),
+                config_path,
+            )
 
     search_opts = cfg.search
 
@@ -144,6 +160,7 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
             country_hint=hit.country,
             category_hint=hit.category,
             our_brand_context=extract_opts.get("our_brand_context", ""),
+            target_definition=extract_opts.get("target_definition", ""),
             temperature=float(extract_opts.get("temperature", 0.0)),
         )
         if record is None:
@@ -308,13 +325,25 @@ def main() -> None:
         action="store_true",
         help="이미 저장된 행 중 '바이어 아님' 도메인을 status=not_buyer 로 표시(삭제 안 함)",
     )
+    parser.add_argument(
+        "--tab",
+        default=None,
+        help="결과를 저장할 시트 탭 이름 (예: distributors). 비우면 .env 의 기본 탭",
+    )
     args = parser.parse_args()
     if args.flag_non_buyers:
         flag_non_buyers(config_path=args.config)
     elif args.backfill_contacts:
         backfill_contacts(config_path=args.config, force=args.force)
     else:
-        run(config_path=args.config, dry_run=args.dry_run)
+        # 시트 config 탭(시트에서 설정 편집)은 바이어 기본 모드에서만 사용한다.
+        use_sheet_config = args.config == "config.yaml"
+        run(
+            config_path=args.config,
+            dry_run=args.dry_run,
+            sheet_tab=args.tab,
+            use_sheet_config=use_sheet_config,
+        )
 
 
 if __name__ == "__main__":
