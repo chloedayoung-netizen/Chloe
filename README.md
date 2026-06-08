@@ -100,6 +100,12 @@ python main.py --config config.distributors.yaml --tab distributors
 # 한국 아마존 셀러 모드 — 아마존에 판매 중인 한국 회사 공식사이트/연락처
 # (맥에서는 run_amazon_kr.command 더블클릭)
 python main.py --config config.amazon-kr.yaml --tab amazon_kr
+
+# 경쟁사 모니터링 모드 — 경쟁 브랜드 + 최근 신호(신상/콜라보/오픈)
+python main.py --config config.competitors.yaml --tab competitors
+
+# 채용공고 성장신호 모드 — 채용 중(=성장 중)인 업계 회사
+python main.py --config config.hiring.yaml --tab hiring
 ```
 
 ### 다른 타깃으로 확장하기 (config 파일만 추가)

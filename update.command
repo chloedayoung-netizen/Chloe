@@ -31,6 +31,8 @@ cp -f "$SRC/requirements.txt" .
 cp -f "$SRC/run.command" . 2>/dev/null
 cp -f "$SRC/run_distributors.command" . 2>/dev/null
 cp -f "$SRC/run_amazon_kr.command" . 2>/dev/null
+cp -f "$SRC/run_competitors.command" . 2>/dev/null
+cp -f "$SRC/run_hiring.command" . 2>/dev/null
 cp -f "$SRC/backfill_contacts.command" . 2>/dev/null
 cp -f "$SRC/flag_non_buyers.command" . 2>/dev/null
 cp -f "$SRC/update.command" . 2>/dev/null
@@ -40,6 +42,8 @@ chmod +x ./*.command 2>/dev/null
 # 새 모드 설정파일은 없을 때만 복사(사용자 편집 보존)
 [ -f config.distributors.yaml ] || cp -f "$SRC/config.distributors.yaml" . 2>/dev/null
 [ -f config.amazon-kr.yaml ] || cp -f "$SRC/config.amazon-kr.yaml" . 2>/dev/null
+[ -f config.competitors.yaml ] || cp -f "$SRC/config.competitors.yaml" . 2>/dev/null
+[ -f config.hiring.yaml ] || cp -f "$SRC/config.hiring.yaml" . 2>/dev/null
 rm -rf src && cp -Rf "$SRC/src" .
 rm -rf "$TMP"
 
