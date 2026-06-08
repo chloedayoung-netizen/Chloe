@@ -193,6 +193,64 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
     )
 
 
+def backfill_contacts(config_path: str = "config.yaml") -> None:
+    """이미 시트에 저장됐지만 이메일/인스타가 빈 행만 다시 방문해 연락처를 채운다.
+
+    검색·LLM 추출은 하지 않는다 (비용 0, source_url 만 재방문).
+    """
+    env = Env.load(require_sheets=True)
+    cfg = Config.load(config_path)
+    fetch_opts = cfg.fetch
+
+    from src.sheets import SheetClient  # 지연 import (Google 라이브러리)
+
+    sheet = SheetClient(env.service_account_file, env.sheet_id, env.sheet_tab)
+    sheet.ensure_header()
+
+    targets = sheet.rows_missing_contacts()
+    logger.info("연락처가 비어 있는 기존 행: %d개", len(targets))
+
+    filled = 0
+    for i, item in enumerate(targets, 1):
+        url = item["url"]
+        logger.info("[%d/%d] %s", i, len(targets), url)
+
+        result = fetcher.fetch(
+            url,
+            timeout=int(fetch_opts.get("timeout_seconds", 15)),
+            max_content_chars=int(fetch_opts.get("max_content_chars", 12000)),
+            user_agent=fetch_opts.get("user_agent", "Mozilla/5.0"),
+            blocked_domains=fetch_opts.get("blocked_domains", []),
+        )
+        if not result.ok:
+            logger.info("   ↳ 스킵 (수집 불가: %s)", result.reason)
+            continue
+
+        contacts = fetcher.collect_contacts(
+            url,
+            result.html,
+            timeout=int(fetch_opts.get("timeout_seconds", 15)),
+            user_agent=fetch_opts.get("user_agent", "Mozilla/5.0"),
+        )
+        if not contacts.emails and not contacts.instagram:
+            logger.info("   ↳ 연락처 없음")
+            continue
+
+        sheet.update_contacts(
+            item["row"],
+            ", ".join(contacts.emails),
+            ", ".join(contacts.instagram),
+        )
+        filled += 1
+        logger.info(
+            "   ↳ 채움: %s %s",
+            ", ".join(contacts.emails) or "-",
+            ", ".join(contacts.instagram) or "",
+        )
+
+    logger.info("백필 완료. 연락처 채운 행: %d / %d", filled, len(targets))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="해외 바이어 리서치 자동화 MVP")
     parser.add_argument("--config", default="config.yaml", help="config.yaml 경로")
@@ -201,8 +259,16 @@ def main() -> None:
         action="store_true",
         help="Sheets 에 저장하지 않고 추출 결과만 로그로 확인",
     )
+    parser.add_argument(
+        "--backfill-contacts",
+        action="store_true",
+        help="검색 없이, 이미 저장된 행 중 연락처가 빈 곳만 다시 방문해 이메일/인스타를 채움",
+    )
     args = parser.parse_args()
-    run(config_path=args.config, dry_run=args.dry_run)
+    if args.backfill_contacts:
+        backfill_contacts(config_path=args.config)
+    else:
+        run(config_path=args.config, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":

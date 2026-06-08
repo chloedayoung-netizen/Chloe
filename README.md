@@ -88,6 +88,10 @@ python main.py
 
 # 다른 설정파일로 실행
 python main.py --config config.yaml
+
+# 이미 저장된 행 중 연락처가 빈 곳만 다시 방문해 이메일/인스타 채우기
+# (검색·AI 추출 없음 → 비용 0. 맥에서는 backfill_contacts.command 더블클릭)
+python main.py --backfill-contacts
 ```
 
 ---

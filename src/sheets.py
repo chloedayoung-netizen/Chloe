@@ -97,6 +97,44 @@ class SheetClient:
         rows = result.get("values", [])
         return {row[0].strip() for row in rows if row and row[0].strip()}
 
+    # ---- 백필(기존 행 연락처 채우기) ----
+    def rows_missing_contacts(self) -> list[dict]:
+        """email/instagram 이 비어 있는 기존 행을 반환.
+
+        각 항목: {"row": 행번호(1-indexed), "url": source_url}
+        """
+        rng = f"{self.tab}!A2:{_col(len(HEADERS))}"
+        result = (
+            self._svc.spreadsheets()
+            .values()
+            .get(spreadsheetId=self.sheet_id, range=rng)
+            .execute()
+        )
+        email_idx = HEADERS.index("email")
+        insta_idx = HEADERS.index("instagram")
+        out: list[dict] = []
+        for offset, row in enumerate(result.get("values", [])):
+            url = (row[0].strip() if row and row[0] else "")
+            if not url:
+                continue
+            email = row[email_idx].strip() if len(row) > email_idx else ""
+            insta = row[insta_idx].strip() if len(row) > insta_idx else ""
+            if email or insta:
+                continue  # 이미 연락처 있음 → 건너뜀
+            out.append({"row": offset + 2, "url": url})
+        return out
+
+    def update_contacts(self, row: int, email: str, instagram: str) -> None:
+        """특정 행의 email(N)·instagram(O) 칸만 갱신한다."""
+        n_col = _col(HEADERS.index("email") + 1)
+        o_col = _col(HEADERS.index("instagram") + 1)
+        self._svc.spreadsheets().values().update(
+            spreadsheetId=self.sheet_id,
+            range=f"{self.tab}!{n_col}{row}:{o_col}{row}",
+            valueInputOption="RAW",
+            body={"values": [[email, instagram]]},
+        ).execute()
+
     # ---- 설정(config) 탭 ----
     def ensure_config_tab(self, defaults: dict) -> None:
         """설정 탭이 없거나 비어 있으면 기본값으로 채워 넣는다.
