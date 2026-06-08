@@ -9,24 +9,28 @@ queries:
   - '{category} concept store stockists {country}'
   - '{category} boutique "stocked brands" {country}'
   - 'select shop {category} brands wholesale {country}'
+  - '{category} retailer "our brands" {country}'
 
 # 타깃 국가 (검색어 확장 및 결과 메타데이터용)
 countries:
   - "France"
   - "Japan"
   - "United States"
+  - "United Kingdom"
+  - "Germany"
 
 # 타깃 카테고리
 categories:
-  - "womenswear"
   - "home fragrance"
+  - "niche perfume"
+  - "scented candles"
 
 # 검색 옵션 (Serper.dev / Google 결과)
 search:
   results_per_query: 10        # 쿼리당 가져올 결과 수 (Serper 최대 100/요청)
   language: "en"               # hl: 언어 코드 (예: en, ja, fr). 비우면 기본값
   # country_code: "fr"         # gl: 국가 코드(선택). 보통 쿼리에 국가명이 들어가므로 생략 가능
-  max_total_urls: 60           # 이번 실행에서 처리할 최대 URL 수 (안전 상한)
+  max_total_urls: 30           # 이번 실행에서 처리할 최대 URL 수 (안전 상한)
 
 # HTML 수집 옵션
 fetch:
