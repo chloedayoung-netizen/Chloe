@@ -258,6 +258,33 @@ def backfill_contacts(config_path: str = "config.yaml", force: bool = False) -> 
     logger.info("백필 완료. 연락처 채운 행: %d / %d", filled, len(targets))
 
 
+def flag_non_buyers(config_path: str = "config.yaml") -> None:
+    """이미 저장된 행 중 '바이어 아님' 도메인을 찾아 status 를 not_buyer 로 표시한다.
+
+    삭제는 하지 않는다 — 사용자가 직접 보고 지울 수 있게 표시만 한다.
+    """
+    env = Env.load(require_sheets=True)
+    Config.load(config_path)  # 검증용 로드 (값은 쓰지 않음)
+
+    from src.sheets import SheetClient  # 지연 import (Google 라이브러리)
+
+    sheet = SheetClient(env.service_account_file, env.sheet_id, env.sheet_tab)
+    sheet.ensure_header()
+
+    rows = sheet.all_rows()
+    flagged = 0
+    for item in rows:
+        if not fetcher.is_non_buyer_domain(item["url"]):
+            continue
+        if item["status"] == "not_buyer":
+            continue  # 이미 표시됨
+        sheet.update_status(item["row"], "not_buyer")
+        flagged += 1
+        logger.info("표시(not_buyer): %s", item["url"])
+
+    logger.info("완료. not_buyer 로 표시한 행: %d개", flagged)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="해외 바이어 리서치 자동화 MVP")
     parser.add_argument("--config", default="config.yaml", help="config.yaml 경로")
@@ -276,8 +303,15 @@ def main() -> None:
         action="store_true",
         help="--backfill-contacts 와 함께: 연락처가 이미 있는 행도 다시 확인해 정정",
     )
+    parser.add_argument(
+        "--flag-non-buyers",
+        action="store_true",
+        help="이미 저장된 행 중 '바이어 아님' 도메인을 status=not_buyer 로 표시(삭제 안 함)",
+    )
     args = parser.parse_args()
-    if args.backfill_contacts:
+    if args.flag_non_buyers:
+        flag_non_buyers(config_path=args.config)
+    elif args.backfill_contacts:
         backfill_contacts(config_path=args.config, force=args.force)
     else:
         run(config_path=args.config, dry_run=args.dry_run)

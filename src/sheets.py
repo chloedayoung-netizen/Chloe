@@ -138,6 +138,36 @@ class SheetClient:
             body={"values": [[email, instagram]]},
         ).execute()
 
+    # ---- 행 읽기 / 상태 표시 ----
+    def all_rows(self) -> list[dict]:
+        """저장된 모든 행을 {"row", "url", "status"} 형태로 반환."""
+        rng = f"{self.tab}!A2:{_col(len(HEADERS))}"
+        result = (
+            self._svc.spreadsheets()
+            .values()
+            .get(spreadsheetId=self.sheet_id, range=rng)
+            .execute()
+        )
+        status_idx = HEADERS.index("status")
+        out: list[dict] = []
+        for offset, row in enumerate(result.get("values", [])):
+            url = (row[0].strip() if row and row[0] else "")
+            if not url:
+                continue
+            status = row[status_idx].strip() if len(row) > status_idx else ""
+            out.append({"row": offset + 2, "url": url, "status": status})
+        return out
+
+    def update_status(self, row: int, status: str) -> None:
+        """특정 행의 status(K) 칸만 갱신한다."""
+        k_col = _col(HEADERS.index("status") + 1)
+        self._svc.spreadsheets().values().update(
+            spreadsheetId=self.sheet_id,
+            range=f"{self.tab}!{k_col}{row}",
+            valueInputOption="RAW",
+            body={"values": [[status]]},
+        ).execute()
+
     # ---- 설정(config) 탭 ----
     def ensure_config_tab(self, defaults: dict) -> None:
         """설정 탭이 없거나 비어 있으면 기본값으로 채워 넣는다.
