@@ -30,6 +30,13 @@ HEADERS = [
 
 STATUS_NEW = "new"
 
+# 설정 탭: 사용자가 시트에서 직접 나라/카테고리/검색어를 편집한다.
+CONFIG_TAB = "config"
+
+# 설정 탭에서 읽어들이는 키 (A열) → 값은 B열부터 나열
+CONFIG_LIST_KEYS = {"countries", "categories", "queries"}
+CONFIG_SCALAR_KEYS = {"max_total_urls", "language"}
+
 
 class SheetClient:
     def __init__(self, service_account_file: str, sheet_id: str, tab: str):
@@ -40,9 +47,24 @@ class SheetClient:
         self.sheet_id = sheet_id
         self.tab = tab
 
+    # ---- 탭 존재 보장 ----
+    def _existing_tabs(self) -> set[str]:
+        meta = self._svc.spreadsheets().get(spreadsheetId=self.sheet_id).execute()
+        return {s["properties"]["title"] for s in meta.get("sheets", [])}
+
+    def _ensure_tab(self, title: str) -> None:
+        if title in self._existing_tabs():
+            return
+        self._svc.spreadsheets().batchUpdate(
+            spreadsheetId=self.sheet_id,
+            body={"requests": [{"addSheet": {"properties": {"title": title}}}]},
+        ).execute()
+        logger.info("탭 '%s' 을(를) 새로 만들었습니다.", title)
+
     # ---- 초기화 / 헤더 ----
     def ensure_header(self) -> None:
-        """첫 행에 헤더가 없으면 기록한다."""
+        """결과 탭이 없으면 만들고, 첫 행에 헤더가 없으면 기록한다."""
+        self._ensure_tab(self.tab)
         rng = f"{self.tab}!A1:{_col(len(HEADERS))}1"
         result = (
             self._svc.spreadsheets()
@@ -72,6 +94,65 @@ class SheetClient:
         )
         rows = result.get("values", [])
         return {row[0].strip() for row in rows if row and row[0].strip()}
+
+    # ---- 설정(config) 탭 ----
+    def ensure_config_tab(self, defaults: dict) -> None:
+        """설정 탭이 없거나 비어 있으면 기본값으로 채워 넣는다.
+
+        defaults: {"countries": [...], "categories": [...], "queries": [...],
+                   "max_total_urls": int, "language": str}
+        이미 내용이 있으면(사용자가 편집했으면) 건드리지 않는다.
+        """
+        self._ensure_tab(CONFIG_TAB)
+        rng = f"{CONFIG_TAB}!A1:Z"
+        result = (
+            self._svc.spreadsheets()
+            .values()
+            .get(spreadsheetId=self.sheet_id, range=rng)
+            .execute()
+        )
+        if result.get("values"):
+            return  # 이미 내용 있음 → 사용자 편집 보존
+
+        rows = [
+            ["설정 (B열부터 한 칸에 하나씩 입력하세요. 이 줄은 안내용)", ""],
+            ["countries"] + list(defaults.get("countries", [])),
+            ["categories"] + list(defaults.get("categories", [])),
+            ["queries"] + list(defaults.get("queries", [])),
+            ["max_total_urls", defaults.get("max_total_urls", 30)],
+            ["language", defaults.get("language", "en")],
+        ]
+        self._svc.spreadsheets().values().update(
+            spreadsheetId=self.sheet_id,
+            range=f"{CONFIG_TAB}!A1",
+            valueInputOption="RAW",
+            body={"values": rows},
+        ).execute()
+        logger.info("설정(config) 탭을 기본값으로 채웠습니다.")
+
+    def read_config(self) -> dict:
+        """설정 탭을 읽어 dict 로 반환. 탭이 없으면 빈 dict."""
+        if CONFIG_TAB not in self._existing_tabs():
+            return {}
+        result = (
+            self._svc.spreadsheets()
+            .values()
+            .get(spreadsheetId=self.sheet_id, range=f"{CONFIG_TAB}!A1:Z")
+            .execute()
+        )
+        out: dict = {}
+        for row in result.get("values", []):
+            if not row:
+                continue
+            key = str(row[0]).strip().lower()
+            values = [str(v).strip() for v in row[1:] if str(v).strip()]
+            if key in CONFIG_LIST_KEYS:
+                if values:
+                    out[key] = values
+            elif key in CONFIG_SCALAR_KEYS:
+                if values:
+                    out[key] = values[0]
+        return out
 
     # ---- append ----
     def append_row(self, record: dict, *, search_query: str = "") -> None:

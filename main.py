@@ -33,7 +33,6 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
     env = Env.load(require_sheets=not dry_run)
     cfg = Config.load(config_path)
 
-    search_opts = cfg.search
     fetch_opts = cfg.fetch
     extract_opts = cfg.extract
 
@@ -50,6 +49,36 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
         sheet.ensure_header()
         existing = sheet.existing_urls()
         logger.info("시트에 이미 저장된 URL: %d개", len(existing))
+
+        # 설정(config) 탭: 없으면 config.yaml 값으로 채우고, 있으면 그 값으로 덮어쓴다.
+        # → 사용자는 터미널 대신 구글 시트에서 나라/카테고리/검색어를 바꿀 수 있다.
+        sheet.ensure_config_tab(
+            {
+                "countries": cfg.countries,
+                "categories": cfg.categories,
+                "queries": cfg.queries,
+                "max_total_urls": cfg.search.get("max_total_urls", 30),
+                "language": cfg.search.get("language", "en"),
+            }
+        )
+        sheet_cfg = sheet.read_config()
+        if sheet_cfg.get("countries"):
+            cfg.countries = sheet_cfg["countries"]
+        if sheet_cfg.get("categories"):
+            cfg.categories = sheet_cfg["categories"]
+        if sheet_cfg.get("queries"):
+            cfg.queries = sheet_cfg["queries"]
+        if sheet_cfg.get("max_total_urls"):
+            cfg.search["max_total_urls"] = sheet_cfg["max_total_urls"]
+        if sheet_cfg.get("language"):
+            cfg.search["language"] = sheet_cfg["language"]
+        logger.info(
+            "설정 적용: %d개국 × %d개 카테고리 (시트 config 탭 우선)",
+            len(cfg.countries),
+            len(cfg.categories),
+        )
+
+    search_opts = cfg.search
 
     # --- 1) 검색 ---
     combos = cfg.expanded_queries()
