@@ -1,0 +1,66 @@
+# ============================================================
+# 한국 아마존 셀러 리서치 설정
+# "아마존에 자사 제품을 판매 중인 한국 회사"의 공식 사이트 + 연락처를 모은다.
+# 실행: python main.py --config config.amazon-kr.yaml --tab amazon_kr
+# ============================================================
+
+# 아마존(주로 미국)에 판매 중인 한국 브랜드를 구글에서 찾는 검색어.
+# 마켓플레이스(amazon.com)는 검색어에 직접 박고, {country} 는 회사 기준(한국)이다.
+# (amazon.com / etsy 등 마켓플레이스 페이지는 비-바이어 도메인으로 자동 제외되고,
+#  그 결과 회사의 '공식 웹사이트' 위주로 남는다.)
+queries:
+  - '"Korean brand" {category} amazon.com seller official website'
+  - 'South Korea {category} company "available on Amazon" official site'
+  - '{category} "made in Korea" amazon US brand homepage'
+  - 'Korean {category} brand amazon storefront official website contact'
+  - '"based in South Korea" {category} amazon seller site'
+
+# 타깃 회사의 국가(메타데이터/힌트). 마켓플레이스가 아니라 회사 기준.
+countries:
+  - "South Korea"
+
+# 넓게 잡기 위한 카테고리 (한국 아마존 셀러가 많은 분야 위주)
+categories:
+  - "K-beauty skincare"
+  - "beauty & cosmetics"
+  - "Korean food & snacks"
+  - "home & kitchen"
+  - "health & wellness"
+  - "baby & kids"
+
+search:
+  results_per_query: 10
+  language: "en"
+  max_total_urls: 40
+
+fetch:
+  timeout_seconds: 15
+  max_content_chars: 12000
+  user_agent: "Mozilla/5.0 (compatible; BuyerResearchBot/1.0; +https://example.com/bot)"
+  blocked_domains:
+    - "linkedin.com"
+    - "instagram.com"
+    - "facebook.com"
+    - "twitter.com"
+    - "x.com"
+    - "tiktok.com"
+    - "pinterest.com"
+    - "youtube.com"
+
+extract:
+  temperature: 0
+  our_brand_context: >
+    We are building a list of South Korean companies that sell their own
+    products on Amazon (any category), in order to reach out to them. For each
+    one we want the company's own official website and contact details.
+  # ★ 타깃 정의: '아마존에 파는 한국 회사' + 이 페이지가 그 회사의 공식 사이트인지
+  target_definition: >
+    A relevant target is a company based in South Korea (a Korean brand,
+    manufacturer, or seller) that sells its OWN products on Amazon, AND this page
+    is that company's own official website / brand site. Set is_relevant_buyer to
+    TRUE only when both hold: the company is Korean AND it sells on Amazon (look
+    for mentions of Amazon, "available on Amazon", an Amazon store link, etc.).
+    Set it to FALSE for: Amazon listing/marketplace pages themselves, non-Korean
+    companies, pure resellers that only resell other brands, news articles,
+    listicles, blogs, directories, social media, wikis, and forums. If you cannot
+    confirm the company is Korean, set is_relevant_buyer to FALSE.

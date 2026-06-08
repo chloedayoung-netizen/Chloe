@@ -1,0 +1,62 @@
+# ============================================================
+# 채용공고 기반 '성장신호' 리서치 설정
+# 우리 업계에서 채용 중인(=확장 중인) 회사를 찾아, 영업 타이밍 신호로 활용한다.
+# 실행: python main.py --config config.hiring.yaml --tab hiring
+# ============================================================
+
+# 회사 자체 채용 페이지를 노린다 (LinkedIn/Indeed 등은 차단되어 회사 사이트가 남음).
+queries:
+  - '{category} retailer careers "we are hiring" {country}'
+  - '{category} brand jobs buyer OR merchandiser {country}'
+  - '{category} concept store hiring {country} careers'
+  - '{category} company "join our team" {country} retail'
+  - 'select shop {category} {country} careers new store'
+
+countries:
+  - "France"
+  - "United States"
+  - "United Kingdom"
+  - "Japan"
+  - "Germany"
+
+categories:
+  - "home fragrance"
+  - "niche perfume"
+  - "beauty & lifestyle"
+
+search:
+  results_per_query: 10
+  language: "en"
+  max_total_urls: 40
+
+fetch:
+  timeout_seconds: 15
+  max_content_chars: 12000
+  user_agent: "Mozilla/5.0 (compatible; BuyerResearchBot/1.0; +https://example.com/bot)"
+  blocked_domains:
+    - "linkedin.com"
+    - "instagram.com"
+    - "facebook.com"
+    - "twitter.com"
+    - "x.com"
+    - "tiktok.com"
+    - "pinterest.com"
+    - "youtube.com"
+    - "indeed.com"
+    - "glassdoor.com"
+
+extract:
+  temperature: 0
+  our_brand_context: >
+    We sell to retailers/boutiques in the beauty & lifestyle space. A company
+    that is actively hiring (especially buyers, merchandisers, or new-store
+    staff) is likely growing — a good time to reach out.
+  # ★ 타깃 정의: 우리 업계 회사이고, 채용/확장 신호가 있는지
+  target_definition: >
+    A relevant target is a retailer / boutique / concept store / brand in the
+    beauty & lifestyle space whose page shows it is actively HIRING or EXPANDING
+    (job openings, "we are hiring", "join our team", new store opening). Set
+    is_relevant_buyer to TRUE for such a company and put the hiring/expansion
+    detail in recent_signal. Set is_relevant_buyer to FALSE for: generic job
+    boards or aggregators, recruiting agencies, news, listicles, blogs,
+    directories, social media, wikis, and forums.
