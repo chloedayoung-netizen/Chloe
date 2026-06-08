@@ -193,9 +193,10 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
     )
 
 
-def backfill_contacts(config_path: str = "config.yaml") -> None:
-    """이미 시트에 저장됐지만 이메일/인스타가 빈 행만 다시 방문해 연락처를 채운다.
+def backfill_contacts(config_path: str = "config.yaml", force: bool = False) -> None:
+    """이미 시트에 저장된 행을 다시 방문해 이메일/인스타를 채운다.
 
+    force=False → 연락처가 빈 행만. force=True → 모든 행(잘못 들어간 값 정정).
     검색·LLM 추출은 하지 않는다 (비용 0, source_url 만 재방문).
     """
     env = Env.load(require_sheets=True)
@@ -207,8 +208,10 @@ def backfill_contacts(config_path: str = "config.yaml") -> None:
     sheet = SheetClient(env.service_account_file, env.sheet_id, env.sheet_tab)
     sheet.ensure_header()
 
-    targets = sheet.rows_missing_contacts()
-    logger.info("연락처가 비어 있는 기존 행: %d개", len(targets))
+    targets = sheet.rows_missing_contacts(force=force)
+    logger.info(
+        "연락처 대상 행: %d개%s", len(targets), " (force: 전체 재확인)" if force else ""
+    )
 
     filled = 0
     for i, item in enumerate(targets, 1):
@@ -264,9 +267,14 @@ def main() -> None:
         action="store_true",
         help="검색 없이, 이미 저장된 행 중 연락처가 빈 곳만 다시 방문해 이메일/인스타를 채움",
     )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="--backfill-contacts 와 함께: 연락처가 이미 있는 행도 다시 확인해 정정",
+    )
     args = parser.parse_args()
     if args.backfill_contacts:
-        backfill_contacts(config_path=args.config)
+        backfill_contacts(config_path=args.config, force=args.force)
     else:
         run(config_path=args.config, dry_run=args.dry_run)
 

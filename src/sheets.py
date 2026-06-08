@@ -98,10 +98,12 @@ class SheetClient:
         return {row[0].strip() for row in rows if row and row[0].strip()}
 
     # ---- 백필(기존 행 연락처 채우기) ----
-    def rows_missing_contacts(self) -> list[dict]:
-        """email/instagram 이 비어 있는 기존 행을 반환.
+    def rows_missing_contacts(self, *, force: bool = False) -> list[dict]:
+        """연락처를 채울 대상 행을 반환.
 
         각 항목: {"row": 행번호(1-indexed), "url": source_url}
+        force=False → email/instagram 이 모두 빈 행만.
+        force=True  → URL 이 있는 모든 행 (기존 값 갱신/정정용).
         """
         rng = f"{self.tab}!A2:{_col(len(HEADERS))}"
         result = (
@@ -117,10 +119,11 @@ class SheetClient:
             url = (row[0].strip() if row and row[0] else "")
             if not url:
                 continue
-            email = row[email_idx].strip() if len(row) > email_idx else ""
-            insta = row[insta_idx].strip() if len(row) > insta_idx else ""
-            if email or insta:
-                continue  # 이미 연락처 있음 → 건너뜀
+            if not force:
+                email = row[email_idx].strip() if len(row) > email_idx else ""
+                insta = row[insta_idx].strip() if len(row) > insta_idx else ""
+                if email or insta:
+                    continue  # 이미 연락처 있음 → 건너뜀
             out.append({"row": offset + 2, "url": url})
         return out
 

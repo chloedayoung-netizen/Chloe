@@ -17,11 +17,19 @@ logger = logging.getLogger(__name__)
 # 이메일 정규식 (HTML 원문에서 직접 추출)
 _EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
 
-# 이메일로 오인되기 쉬운 잡음(이미지 해상도, 추적 도메인, 예시 등)을 걸러낸다.
+# 이메일로 오인되기 쉬운 잡음(이미지/코드 파일, 추적 도메인, 예시 주소 등)을 걸러낸다.
 _EMAIL_JUNK = (
-    ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", "@2x", "@3x",
-    "sentry.io", "wixpress.com", "example.com", "example.org",
-    "yourdomain", "domain.com", "email.com", "@sentry",
+    # 이미지/코드/폰트 등 자산 파일명이 user@file.ext 형태로 잡히는 경우
+    ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".ico", ".mp4",
+    ".css", ".js", ".json", ".map", ".scss", ".less", ".woff", ".ttf",
+    ".min", "@2x", "@3x",
+    # 추적/플랫폼 도메인
+    "sentry.io", "wixpress.com", "@sentry",
+    # 예시/플레이스홀더 주소
+    "example.com", "example.org", "example@", "@example",
+    "yourdomain", "@domain.", "domain.com", "email.com", "@email.",
+    "xxx@", "@xxx", "your@", "youremail", "yourname", "test@test",
+    "sample@", "user@domain", "@sample",
 )
 
 # 인스타그램 핸들 추출 (instagram.com/<handle>)
