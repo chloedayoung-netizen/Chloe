@@ -5,13 +5,35 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
-from urllib.parse import urlparse
+import re
+from dataclasses import dataclass, field
+from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
+
+# 이메일 정규식 (HTML 원문에서 직접 추출)
+_EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
+
+# 이메일로 오인되기 쉬운 잡음(이미지 해상도, 추적 도메인, 예시 등)을 걸러낸다.
+_EMAIL_JUNK = (
+    ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", "@2x", "@3x",
+    "sentry.io", "wixpress.com", "example.com", "example.org",
+    "yourdomain", "domain.com", "email.com", "@sentry",
+)
+
+# 인스타그램 핸들 추출 (instagram.com/<handle>)
+_INSTA_RE = re.compile(r"instagram\.com/([A-Za-z0-9_.]+)")
+# 핸들이 아닌 경로(게시물/탐색 등)는 제외한다.
+_INSTA_SKIP = {
+    "p", "explore", "accounts", "reel", "reels", "stories",
+    "tv", "about", "developer", "legal", "directory", "web", "",
+}
+
+# 연락처 페이지로 추정되는 링크 텍스트/경로 키워드
+_CONTACT_HINTS = ("contact", "about", "wholesale", "stockist", "trade", "press", "kontakt")
 
 # 로그인/차단 페이지를 암시하는 신호
 LOGIN_MARKERS = (
@@ -34,6 +56,13 @@ class FetchResult:
     ok: bool
     text: str = ""
     reason: str = ""
+    html: str = ""  # 연락처 추출용 원본 HTML (성공 시에만 채움)
+
+
+@dataclass
+class Contacts:
+    emails: list[str] = field(default_factory=list)
+    instagram: list[str] = field(default_factory=list)
 
 
 def is_blocked_domain(url: str, blocked: list[str]) -> bool:
@@ -92,4 +121,102 @@ def fetch(
     if any(marker in lowered for marker in LOGIN_MARKERS):
         return FetchResult(url, False, reason="login_or_block_page")
 
-    return FetchResult(url, True, text=text)
+    return FetchResult(url, True, text=text, html=resp.text)
+
+
+# --------------------------------------------------------------------------
+# 연락처(이메일·인스타) 수집 — 발굴된 페이지에서 무료로 추출.
+# 메인 페이지에 이메일이 없으면 contact/about 페이지 한 곳만 더 들어가 본다.
+# --------------------------------------------------------------------------
+def find_emails(html: str) -> list[str]:
+    """HTML 원문에서 이메일을 추출(잡음 제거, 중복 제거, 소문자화)."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for raw in _EMAIL_RE.findall(html or ""):
+        email = raw.strip().rstrip(".").lower()
+        if email in seen:
+            continue
+        if any(junk in email for junk in _EMAIL_JUNK):
+            continue
+        seen.add(email)
+        out.append(email)
+    return out
+
+
+def find_instagram(html: str) -> list[str]:
+    """HTML 원문에서 인스타그램 핸들(@handle)을 추출."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for handle in _INSTA_RE.findall(html or ""):
+        h = handle.strip().strip(".").lower()
+        if not h or h in _INSTA_SKIP or h in seen:
+            continue
+        seen.add(h)
+        out.append("@" + h)
+    return out
+
+
+def _find_contact_links(html: str, base_url: str) -> list[str]:
+    """같은 도메인 안에서 contact/about/wholesale 등으로 보이는 링크를 모은다."""
+    soup = BeautifulSoup(html or "", "lxml")
+    base_host = (urlparse(base_url).hostname or "").lower()
+    found: list[str] = []
+    seen: set[str] = set()
+    for a in soup.find_all("a", href=True):
+        href = a["href"].strip()
+        text = a.get_text(" ", strip=True).lower()
+        haystack = (href + " " + text).lower()
+        if not any(hint in haystack for hint in _CONTACT_HINTS):
+            continue
+        full = urljoin(base_url, href)
+        if (urlparse(full).hostname or "").lower() != base_host:
+            continue
+        if full in seen:
+            continue
+        seen.add(full)
+        found.append(full)
+    return found
+
+
+def _raw_get(url: str, *, timeout: int, user_agent: str) -> str:
+    """단순 GET 으로 HTML 문자열을 반환(실패하면 빈 문자열)."""
+    try:
+        resp = requests.get(
+            url,
+            headers={"User-Agent": user_agent, "Accept-Language": "en-US,en;q=0.9"},
+            timeout=timeout,
+            allow_redirects=True,
+        )
+    except requests.RequestException:
+        return ""
+    if resp.status_code >= 400:
+        return ""
+    if "html" not in resp.headers.get("Content-Type", "").lower():
+        return ""
+    return resp.text
+
+
+def collect_contacts(
+    page_url: str,
+    html: str,
+    *,
+    timeout: int = 15,
+    user_agent: str = "Mozilla/5.0",
+    follow_contact_page: bool = True,
+) -> Contacts:
+    """발굴된 페이지에서 연락처를 추출. 이메일이 없으면 contact 페이지 1곳을 더 본다."""
+    emails = find_emails(html)
+    instagram = find_instagram(html)
+
+    if follow_contact_page and not emails:
+        for link in _find_contact_links(html, page_url)[:2]:
+            sub_html = _raw_get(link, timeout=timeout, user_agent=user_agent)
+            if not sub_html:
+                continue
+            emails = find_emails(sub_html)
+            if not instagram:
+                instagram = find_instagram(sub_html)
+            if emails:
+                break
+
+    return Contacts(emails=emails, instagram=instagram)

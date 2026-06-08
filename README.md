@@ -2,11 +2,12 @@
 
 Clay 없이 해외 바이어(편집숍/셀렉트숍/부티크 등) 후보를 찾고, 각 회사의 공식
 웹사이트에서 **입점 브랜드 / 카테고리 / 최근 신호 / 근거 문장 / 개인화 메일 첫
-문장**을 추출해 **Google Sheets**에 저장하는 파이프라인입니다.
+문장 / 연락처(이메일·인스타)**를 추출해 **Google Sheets**에 저장하는 파이프라인입니다.
 
 ```
 웹 검색(Serper.dev)  →  HTML 수집(BeautifulSoup)  →
-OpenAI Structured Outputs(스키마 검증)  →  Google Sheets append(중복 제외)
+OpenAI Structured Outputs(스키마 검증)  →  연락처 수집(이메일·인스타) →
+Google Sheets append(중복 제외)
 ```
 
 발송 기능은 포함하지 않으며, 시트의 `status` 컬럼으로 진행 상태만 관리합니다.
@@ -27,7 +28,7 @@ Chloe/
     ├── __init__.py
     ├── config.py        # .env + config.yaml 로딩, 쿼리 확장
     ├── search.py        # Serper.dev (Google 결과) 검색 API
-    ├── fetcher.py       # HTML 수집 + 접근불가/로그인/SNS 스킵
+    ├── fetcher.py       # HTML 수집 + 접근불가/로그인/SNS 스킵 + 연락처(이메일·인스타) 추출
     ├── schema.py        # 추출 JSON Schema (Structured Outputs)
     ├── extractor.py     # OpenAI 추출 + 스키마 검증
     └── sheets.py        # Google Sheets append + URL 중복 방지
@@ -110,6 +111,8 @@ python main.py --config config.yaml
 | K | `status` | **`new` / `reviewed` / `contacted` / `replied`** |
 | L | `search_query` | 이 후보를 찾은 검색 쿼리 |
 | M | `created_at` | 저장 시각 (UTC ISO8601) |
+| N | `email` | 페이지/contact 페이지에서 수집한 이메일 (콤마 구분, 없으면 빈칸) |
+| O | `instagram` | 페이지에서 수집한 인스타 핸들 (콤마 구분, 없으면 빈칸) |
 
 - 모든 행은 `source_url` 과 `evidence_text` 를 반드시 포함합니다 (둘 중 하나라도
   비면 저장하지 않음).

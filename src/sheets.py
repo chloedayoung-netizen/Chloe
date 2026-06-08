@@ -26,6 +26,8 @@ HEADERS = [
     "status",           # K  new / reviewed / contacted / replied
     "search_query",     # L
     "created_at",       # M  UTC ISO8601
+    "email",            # N  수집된 이메일 (콤마 구분)
+    "instagram",        # O  인스타 핸들 (콤마 구분)
 ]
 
 STATUS_NEW = "new"
@@ -184,7 +186,16 @@ def _record_to_row(record: dict, *, search_query: str = "") -> list:
         record.get("status", STATUS_NEW),
         search_query,
         datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        _join(record.get("email", [])),
+        _join(record.get("instagram", [])),
     ]
+
+
+def _join(value) -> str:
+    """리스트면 콤마로 합치고, 문자열이면 그대로 반환."""
+    if isinstance(value, list):
+        return ", ".join(value)
+    return str(value or "")
 
 
 def _col(n: int) -> str:

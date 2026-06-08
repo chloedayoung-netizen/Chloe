@@ -156,6 +156,22 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
         record["source_url"] = hit.url
         record["status"] = "new"
 
+        # 연락처(이메일·인스타) 무료 수집. 메인 페이지에 없으면 contact 페이지 1곳 추가 확인.
+        contacts = fetcher.collect_contacts(
+            hit.url,
+            result.html,
+            timeout=int(fetch_opts.get("timeout_seconds", 15)),
+            user_agent=fetch_opts.get("user_agent", "Mozilla/5.0"),
+        )
+        record["email"] = contacts.emails
+        record["instagram"] = contacts.instagram
+        if contacts.emails or contacts.instagram:
+            logger.info(
+                "   ↳ 연락처: %s %s",
+                ", ".join(contacts.emails) or "-",
+                ", ".join(contacts.instagram) or "",
+            )
+
         if dry_run:
             logger.info(
                 "   ↳ [DRY-RUN] %s | brands=%s | %s",
