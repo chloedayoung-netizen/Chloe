@@ -43,6 +43,27 @@ _INSTA_SKIP = {
 # 연락처 페이지로 추정되는 링크 텍스트/경로 키워드
 _CONTACT_HINTS = ("contact", "about", "wholesale", "stockist", "trade", "press", "kontakt")
 
+# "실제 바이어가 아닌" 도메인 (코드 내장 기본값 → 업데이트로 배포).
+# 뉴스/미디어, 마켓플레이스, 도매 플랫폼, 위키/리뷰/콘텐츠 등 — 발굴 단계에서 거른다.
+# config.yaml 의 blocked_domains(SNS 등)와 별개로 항상 적용된다.
+NON_BUYER_DOMAINS = (
+    # 뉴스/미디어
+    "fashionnetwork.com", "premiumbeautynews.com", "vogue.com", "wwd.com",
+    "businessoffashion.com", "forbes.com", "elle.com", "harpersbazaar.com",
+    "cosmopolitan.com", "byrdie.com", "allure.com", "refinery29.com",
+    # 마켓플레이스 / 도매 플랫폼 (개별 페이지는 바이어가 아님)
+    "amazon.com", "amazon.co.uk", "amazon.fr", "amazon.de", "amazon.co.jp",
+    "ebay.com", "etsy.com", "aliexpress.com", "alibaba.com",
+    "faire.com", "ankorstore.com", "ankorstore.eu", "rangeme.com",
+    "walmart.com", "target.com", "notonthehighstreet.com",
+    # SNS/콘텐츠/리뷰/참고
+    "lemon8-app.com", "reddit.com", "medium.com", "substack.com",
+    "wikipedia.org", "quora.com", "tripadvisor.com", "yelp.com",
+    "blogspot.com", "wordpress.com", "tumblr.com",
+    # 검색/지도/포털
+    "google.com", "bing.com", "yahoo.com", "baidu.com", "naver.com",
+)
+
 # 로그인/차단 페이지를 암시하는 신호
 LOGIN_MARKERS = (
     "sign in",
@@ -76,6 +97,12 @@ class Contacts:
 def is_blocked_domain(url: str, blocked: list[str]) -> bool:
     host = (urlparse(url).hostname or "").lower()
     return any(host == d or host.endswith("." + d) for d in blocked)
+
+
+def is_non_buyer_domain(url: str) -> bool:
+    """뉴스/마켓플레이스/SNS 등 '실제 바이어가 아닌' 도메인이면 True."""
+    host = (urlparse(url).hostname or "").lower()
+    return any(host == d or host.endswith("." + d) for d in NON_BUYER_DOMAINS)
 
 
 def _clean_text(html: str, max_chars: int) -> str:

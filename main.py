@@ -107,6 +107,10 @@ def run(config_path: str = "config.yaml", dry_run: bool = False) -> None:
             url = hit.url.strip()
             if not url or url in seen_this_run or url in existing:
                 continue
+            # 뉴스/마켓플레이스/SNS 등 '실제 바이어가 아닌' 도메인은 발굴 단계에서 제외
+            if fetcher.is_non_buyer_domain(url):
+                logger.info("   ↳ 제외 (바이어 아님 도메인): %s", url)
+                continue
             seen_this_run.add(url)
             candidates.append(hit)
             if len(candidates) >= max_total:

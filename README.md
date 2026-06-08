@@ -28,7 +28,7 @@ Chloe/
     ├── __init__.py
     ├── config.py        # .env + config.yaml 로딩, 쿼리 확장
     ├── search.py        # Serper.dev (Google 결과) 검색 API
-    ├── fetcher.py       # HTML 수집 + 접근불가/로그인/SNS 스킵 + 연락처(이메일·인스타) 추출
+    ├── fetcher.py       # HTML 수집 + 접근불가/로그인/SNS/비바이어 도메인 스킵 + 연락처 추출
     ├── schema.py        # 추출 JSON Schema (Structured Outputs)
     ├── extractor.py     # OpenAI 추출 + 스키마 검증
     └── sheets.py        # Google Sheets append + URL 중복 방지
