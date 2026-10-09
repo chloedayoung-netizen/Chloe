@@ -1,0 +1,99 @@
+/* 사이트 전역 변수·베이스 스타일 (2sikkleqdgd2n.css 중 디자인시스템 토큰 이후 부분) */
+:root {
+  --desktop-s:.7px;
+  --ui-scale:.7;
+  --quote-duration:1.1s;
+  --s:min(calc(100vw / 1920), var(--desktop-s));
+  --design-w:min(calc(100vw - 40 * var(--desktop-s)), calc(1600 * var(--desktop-s)));
+  --ink:#141946;
+  --body:#000;
+  --muted:#707070;
+  --line:#d9d9d9;
+  --paper:#fff;
+  --chip:#f2f2f2;
+  --key-purple:#8278ff;
+  --key-purple-deep:#826fff;
+  --key-green:#19e173;
+  --key-mint:#78f0e6;
+  --key-yellow:#ffe400;
+  --fade-to-white:linear-gradient(180deg, #fff0 0%, #ffffff0b 12.5%, #ffffff28 25%, #ffffff51 37.5%, #ffffff80 50%, #ffffffae 62.5%, #ffffffd7 75%, #fffffff4 87.5%, #fff 100%);
+  --font-kr:"Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+  --font-en:"Inter", var(--font-kr);
+  --font-site:var(--font-kr);
+}
+:root:lang(en) {
+  --font-site:var(--font-en);
+}
+.landingMain {
+  padding-bottom:calc(102 * var(--s));
+}
+@media (max-width:1023.98px) {
+  .landingMain {
+    padding-bottom:calc(8 * var(--s));
+  }
+  :root {
+    --s:min(calc(100vw / 400), 1.25px);
+    --ui-scale:1;
+    --design-w:100%;
+  }
+}
+* {
+  box-sizing:border-box;
+}
+html {
+  scroll-behavior:smooth;
+}
+body {
+  background:var(--paper);
+  color:var(--body);
+  font-family:var(--font-site);
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+  margin:0;
+}
+html,body {
+  overflow-x:clip;
+}
+img,svg {
+  max-width:100%;
+  display:block;
+}
+a {
+  color:inherit;
+  text-decoration:none;
+}
+button {
+  font:inherit;
+  color:inherit;
+  cursor:pointer;
+  background:0 0;
+  border:0;
+  font-weight:900;
+  line-height:1em;
+}
+.shell {
+  width:100%;
+  max-width:var(--design-w);
+  margin:0 auto;
+}
+.pre {
+  white-space:pre-line;
+}
+.srOnly {
+  clip:rect(0 0 0 0);
+  white-space:nowrap;
+  border:0;
+  width:1px;
+  height:1px;
+  margin:-1px;
+  padding:0;
+  position:absolute;
+  overflow:hidden;
+}
+.applyMain {
+  min-height:60vh;
+  padding:calc(80 * var(--s)) calc(20 * var(--s));
+  background:#fff;
+  place-items:center;
+  display:grid;
+}
