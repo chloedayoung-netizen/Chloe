@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>넥스트 스테이지 2026</title>
+<meta name="description" content="가능성을 증명하는 창업가들의 무대">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header class="gnb" id="gnb">
+  <div class="gnb__inner">
+    <a href="#top" class="gnb__logo"><span class="gnb__mark" aria-hidden="true"></span>넥스트 스테이지</a>
+    <nav class="gnb__nav" aria-label="주요 메뉴">
+      <a href="#about">About</a>
+      <a href="#programs">Startups</a>
+      <a href="#perks">Perks</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="gnb__right">
+      <button type="button" class="gnb__lang">EN</button>
+      <a href="#apply" class="btn-pill">참가하기</a>
+      <button type="button" class="gnb__burger" aria-label="메뉴 열기" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <canvas class="hero__canvas" aria-hidden="true"></canvas>
+  <div class="hero__copy">
+    <p class="hero__eyebrow en">NEXT STAGE 2026</p>
+    <h1 class="hero__title">가능성은<br>끝이 없다</h1>
+  </div>
+  <a href="#about" class="hero__cue" aria-label="About 섹션으로 이동">
+    <span>2026. 11. 20 금 13:00<br>서울 컨벤션홀</span>
+    <svg viewBox="0 0 24 12" fill="none" aria-hidden="true"><path d="M1 1L12 11L23 1" stroke="currentColor" stroke-width="2"/></svg>
+  </a>
+</section>
+
+<div class="floating" id="floating" role="group" aria-label="행사 참여 및 공유">
+  <a href="#apply">참가하기</a>
+  <span class="floating__div" aria-hidden="true"></span>
+  <button type="button" class="floating__share" data-share aria-label="페이지 링크 복사">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="18" cy="5" r="3" fill="currentColor"/><circle cx="6" cy="12" r="3" fill="currentColor"/><circle cx="18" cy="19" r="3" fill="currentColor"/><path d="m8.7 10.6 6.6-4M8.7 13.4l6.6 4" stroke="currentColor" stroke-width="2"/></svg>
+  </button>
+</div>
+
+<main>
+  <section class="sec" id="about">
+    <div class="shell">
+      <h2 class="h2">About</h2>
+      <p class="lead pre">2016년부터 지금까지, 넥스트 스테이지는
+도전하는 창업가들과 함께 새로운 무대를 만들어왔습니다.</p>
+      <p class="lead pre">올해도 한계를 넘어서려는 여러분을 이 무대에 초대합니다.</p>
+      <ul class="about__cards">
+        <li class="about__card" style="--cardColor: var(--key-1)">
+          <div class="about__art" data-art="0"></div>
+          <div class="about__body">
+            <span class="chip-tag">도전</span>
+            <h3 class="about__h3">스타트업 피칭</h3>
+            <p class="about__desc pre">한 해 동안 성장한
+창업가 12팀이 무대에 오릅니다.</p>
+          </div>
+        </li>
+        <li class="about__card" style="--cardColor: var(--key-4)">
+          <div class="about__art" data-art="1"></div>
+          <div class="about__body">
+            <span class="chip-tag">성장</span>
+            <h3 class="about__h3">키노트 세션</h3>
+            <p class="about__desc pre">업계를 바꾼 창업가가
+올해의 주제 '확장'을 이야기합니다.</p>
+          </div>
+        </li>
+        <li class="about__card" style="--cardColor: var(--key-3)">
+          <div class="about__art" data-art="2"></div>
+          <div class="about__body">
+            <span class="chip-tag">나눔</span>
+            <h3 class="about__h3">참가자 전원 혜택</h3>
+            <p class="about__desc pre">파트너사 8곳과 함께
+특별한 혜택을 준비했습니다.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="film" id="film" aria-label="오프닝">
+    <div class="film__sticky">
+      <div class="film__box" id="filmBox">
+        <div class="film__art" aria-hidden="true"></div>
+        <p class="film__text">한 걸음 더,<br>다음 무대로</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="programs">
+    <div class="shell">
+      <h2 class="h2">Startups</h2>
+      <div class="tabs" role="tablist" aria-label="참가 프로그램" id="programTabs"></div>
+      <p class="programs__tagline" id="programTagline"></p>
+      <ul class="teams" id="teams"></ul>
+    </div>
+  </section>
+
+  <section class="sec" id="perks">
+    <div class="shell">
+      <h2 class="h2">Perks</h2>
+      <p class="lead">넥스트 스테이지는 언젠가 이 무대에 오를 모든 이들의 가능성을 응원합니다.</p>
+      <p class="perks__hint">파트너 로고를 누르면 혜택을 볼 수 있어요</p>
+      <div class="perks__content">
+        <ul class="perks__logos" id="perkLogos"></ul>
+        <article class="perks__panel" id="perkPanel" aria-live="polite"></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="faq">
+    <div class="shell">
+      <h2 class="h2">FAQ</h2>
+      <div class="tabs faq__tabs" role="tablist" aria-label="자주 묻는 질문 분류" id="faqTabs"></div>
+      <ul class="faq__list" id="faqList"></ul>
+    </div>
+  </section>
+
+  <section class="sec quote" id="quote">
+    <blockquote class="shell">
+      <div class="quote__rows">
+        <p class="quote__row"><span>가능성은 처음부터 정해진 것이 아니다.</span></p>
+        <p class="quote__row"><span>작은 시도가</span><i class="quote__window" style="--w: var(--key-1); --ww: calc(330 * var(--s))"></i><span>모이고 쌓여</span></p>
+        <p class="quote__row"><span>누구도 예상하지 못한 길을 만든다.</span></p>
+        <p class="quote__row"><span>오늘의</span><i class="quote__window" style="--w: var(--key-4); --ww: calc(510 * var(--s))"></i><span>도전이 내일의 기준이 된다.</span></p>
+      </div>
+      <footer class="quote__by">넥스트 스테이지 선언문</footer>
+    </blockquote>
+  </section>
+
+  <section class="heritage" id="heritage">
+    <div class="heritage__sticky">
+      <div class="shell">
+        <h2 class="h2">Heritage</h2>
+        <p class="heritage__sub">창업가와 함께 성장해온 시간</p>
+        <div class="heritage__row">
+          <p class="heritage__side" aria-hidden="true"><span class="reveal" id="hYear"></span></p>
+          <div class="heritage__stage" id="hStage"></div>
+          <p class="heritage__side" aria-hidden="true"><span class="reveal" id="hRound"></span></p>
+        </div>
+        <p class="heritage__caption" aria-live="polite"><span class="reveal" id="hCaption"></span></p>
+        <div class="heritage__bar" aria-hidden="true"><i id="hBar"></i></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer" id="apply">
+  <div class="shell">
+    <div class="footer__top">
+      <span class="gnb__logo"><span class="gnb__mark" style="background: var(--ink)" aria-hidden="true"></span>넥스트 스테이지</span>
+      <nav class="footer__links" aria-label="관련 프로그램">
+        <a href="#">넥스트 캠퍼스</a><a href="#">넥스트 랩</a><a href="#">넥스트 펠로우</a>
+      </nav>
+    </div>
+    <div class="footer__cols">
+      <div>
+        <p class="footer__org">넥스트 파운데이션</p>
+        <p class="footer__about pre">넥스트 파운데이션은 창업 교육, 초기 투자, 커뮤니티 운영을 통해
+더 많은 사람이 자신의 아이디어를 실현할 수 있도록 돕고 있습니다.</p>
+      </div>
+      <div class="footer__right">
+        <div class="footer__sns">
+          <a href="#" aria-label="YouTube">YT</a><a href="#" aria-label="Instagram">IG</a><a href="#" aria-label="LinkedIn">in</a>
+        </div>
+        <a href="#">[개인정보처리방침]</a>
+        <a class="footer__email" href="mailto:hello@example.com">hello@example.com</a>
+        <p>© Next Foundation. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="./main.js"></script>
+</body>
+</html>
