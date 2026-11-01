@@ -1,0 +1,23 @@
+# Secrets
+.env
+service_account.json
+*.pem
+*.json.key
+
+# Local run artifacts
+seen_urls.txt
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

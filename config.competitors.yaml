@@ -1,0 +1,62 @@
+# ============================================================
+# 경쟁사 모니터링 설정
+# 같은 카테고리의 경쟁 브랜드를 찾고, 신상/가격/프로모션 등 '최근 신호'를 포착한다.
+# 실행: python main.py --config config.competitors.yaml --tab competitors
+# ============================================================
+
+# 경쟁 브랜드/제품 신호를 찾는 검색어
+queries:
+  - '{category} brand new launch {country}'
+  - 'new {category} brand {country} "now available"'
+  - 'best {category} brands {country} 2026'
+  - 'emerging {category} brand {country}'
+  - '{category} brand limited edition collaboration {country}'
+
+# 모니터링할 시장
+countries:
+  - "France"
+  - "United States"
+  - "United Kingdom"
+  - "Japan"
+  - "South Korea"
+
+categories:
+  - "home fragrance"
+  - "niche perfume"
+  - "scented candles"
+
+search:
+  results_per_query: 10
+  language: "en"
+  max_total_urls: 40
+
+fetch:
+  timeout_seconds: 15
+  max_content_chars: 12000
+  user_agent: "Mozilla/5.0 (compatible; BuyerResearchBot/1.0; +https://example.com/bot)"
+  blocked_domains:
+    - "linkedin.com"
+    - "instagram.com"
+    - "facebook.com"
+    - "twitter.com"
+    - "x.com"
+    - "tiktok.com"
+    - "pinterest.com"
+    - "youtube.com"
+
+extract:
+  temperature: 0
+  our_brand_context: >
+    We are a Korean fragrance & lifestyle brand monitoring competitors in the
+    same space. We want to track other brands in our categories and any recent
+    signals (new product launches, collaborations, store openings, promotions).
+  # ★ 타깃 정의: 경쟁 '브랜드/제조사'이고 최근 신호가 있는지
+  target_definition: >
+    A relevant target is a BRAND or maker of products in our category
+    (fragrance / candles / home / lifestyle) — i.e. a competitor that designs
+    and sells its own products. Set is_relevant_buyer to TRUE for such a brand.
+    Prioritise pages that show a recent signal: new product launch, new
+    collection, collaboration, store/pop-up opening, or promotion — capture it in
+    recent_signal. Set is_relevant_buyer to FALSE for: multi-brand retailers or
+    marketplaces, news articles, listicles, blogs, directories, social media,
+    wikis, and forums.

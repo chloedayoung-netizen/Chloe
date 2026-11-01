@@ -1,0 +1,58 @@
+# ============================================================
+# 해외 바이어 리서치 자동화 - 검색/추출 설정
+# ============================================================
+
+# 검색 쿼리 목록.
+# {country} / {category} 플레이스홀더는 아래 countries/categories 와 조합되어
+# 자동으로 확장됩니다. (queries x countries x categories)
+queries:
+  - '{category} concept store stockists {country}'
+  - '{category} boutique "stocked brands" {country}'
+  - 'select shop {category} brands wholesale {country}'
+  - '{category} retailer "our brands" {country}'
+
+# 타깃 국가 (검색어 확장 및 결과 메타데이터용)
+countries:
+  - "France"
+  - "Japan"
+  - "United States"
+  - "United Kingdom"
+  - "Germany"
+
+# 타깃 카테고리
+categories:
+  - "home fragrance"
+  - "niche perfume"
+  - "scented candles"
+
+# 검색 옵션 (Serper.dev / Google 결과)
+search:
+  results_per_query: 10        # 쿼리당 가져올 결과 수 (Serper 최대 100/요청)
+  language: "en"               # hl: 언어 코드 (예: en, ja, fr). 비우면 기본값
+  # country_code: "fr"         # gl: 국가 코드(선택). 보통 쿼리에 국가명이 들어가므로 생략 가능
+  max_total_urls: 30           # 이번 실행에서 처리할 최대 URL 수 (안전 상한)
+
+# HTML 수집 옵션
+fetch:
+  timeout_seconds: 15
+  max_content_chars: 12000     # OpenAI 에 넘길 본문 텍스트 최대 길이
+  user_agent: "Mozilla/5.0 (compatible; BuyerResearchBot/1.0; +https://example.com/bot)"
+  # 자동 스크래핑에서 제외할 도메인 (로그인 기반 SNS 등)
+  blocked_domains:
+    - "linkedin.com"
+    - "instagram.com"
+    - "facebook.com"
+    - "twitter.com"
+    - "x.com"
+    - "tiktok.com"
+    - "pinterest.com"
+    - "youtube.com"
+
+# 추출(OpenAI) 옵션
+extract:
+  temperature: 0
+  # 입점 브랜드/신호를 판단할 때 모델에 주는 우리 회사/제품 맥락
+  our_brand_context: >
+    We are a Korean independent fragrance & lifestyle brand looking for
+    overseas wholesale/stockist partners (concept stores, select shops,
+    boutiques) who carry niche international brands.

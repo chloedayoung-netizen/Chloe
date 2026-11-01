@@ -1,0 +1,67 @@
+# ============================================================
+# 해외 유통사 / 수입대행 에이전시 리서치 설정
+# 실행: python main.py --config config.distributors.yaml
+# (시트 탭은 .env 의 GOOGLE_SHEET_TAB 을 distributors 등으로 바꿔 쓰면 분리됩니다)
+# ============================================================
+
+# 우리 카테고리를 취급할 수 있는 "수입/유통/도매 파트너"를 찾는 검색어
+queries:
+  - '{category} distributor {country}'
+  - '{category} wholesale distributor "brands we represent" {country}'
+  - '{category} import agency "we distribute" {country}'
+  - 'beauty lifestyle brand distributor {country} "become a stockist"'
+  - '{category} sales agency showroom {country} contact'
+
+# 유통망을 뚫고 싶은 시장(국가)
+countries:
+  - "France"
+  - "Germany"
+  - "United States"
+  - "United Kingdom"
+  - "Japan"
+
+# 우리 제품군
+categories:
+  - "home fragrance"
+  - "niche perfume"
+  - "beauty & lifestyle"
+
+# 검색 옵션
+search:
+  results_per_query: 10
+  language: "en"
+  max_total_urls: 30
+
+# HTML 수집 옵션 (바이어 설정과 동일)
+fetch:
+  timeout_seconds: 15
+  max_content_chars: 12000
+  user_agent: "Mozilla/5.0 (compatible; BuyerResearchBot/1.0; +https://example.com/bot)"
+  blocked_domains:
+    - "linkedin.com"
+    - "instagram.com"
+    - "facebook.com"
+    - "twitter.com"
+    - "x.com"
+    - "tiktok.com"
+    - "pinterest.com"
+    - "youtube.com"
+
+# 추출 옵션 — 여기서 "무엇을 적합한 타깃으로 볼지"를 유통사 기준으로 바꾼다.
+extract:
+  temperature: 0
+  our_brand_context: >
+    We are a Korean independent fragrance & lifestyle brand looking for an
+    importer / distributor / sales agency / brand-representative in each target
+    market that can place our products into local retailers.
+  # ★ 핵심: 타깃 정의를 유통사/에이전시로 지정 (이게 LLM 의 is_relevant_buyer 판단 기준)
+  target_definition: >
+    A relevant target is a B2B distributor, importer, wholesale agency, sales
+    agency, brand representative, or showroom that brings beauty / fragrance /
+    home / lifestyle brands into this market and places them with retailers.
+    It works business-to-business (representing or distributing other brands),
+    NOT a store selling to end consumers. Set is_relevant_buyer to TRUE for such
+    distributors/agencies. Set it to FALSE for: ordinary retail stores or
+    boutiques (end-consumer shops), single-brand manufacturer sites, news,
+    magazines, blogs, marketplaces (Amazon, Etsy, Faire, Ankorstore), directory
+    pages, social media, wikis, and forums.
