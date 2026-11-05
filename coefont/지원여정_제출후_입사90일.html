@@ -1,0 +1,314 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>CoeFont 지원 여정</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{--ink:#191f28;--body:#333d4b;--muted:#6b7684;--faint:#8b95a1;--line:#e5e8eb;--tint:#f7f8fa;--mark:#ffe14d;--warn:#8a6408;--warnbg:#fff4d6;--ok:#1b7f4b}
+*{box-sizing:border-box}
+html{background:#f2f4f6}
+body{margin:0;font-family:Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--body);font-size:14px;line-height:1.65;word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased}
+main{max-width:860px;margin:0 auto;padding:32px 16px 64px}
+h1,h2,h3,h4,p,ul,ol{margin:0}
+h1{font-size:26px;line-height:1.35;font-weight:800;letter-spacing:-.6px;color:var(--ink)}
+h2{font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 4px}
+h3{font-size:14.5px;font-weight:750;color:var(--ink);margin:18px 0 6px}
+h4{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 3px}
+b,strong{color:var(--ink)}
+a{color:inherit}
+mark{background:linear-gradient(transparent 60%,var(--mark) 60%);color:inherit;padding:0 1px}
+.eyebrow{font-size:12px;color:var(--muted)}
+.lead{font-size:15px;margin-top:8px;color:var(--ink);font-weight:600}
+.card{background:#fff;border-radius:12px;padding:22px 22px;margin-top:16px;box-shadow:0 1px 6px #191f2808}
+.stage-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:10px}
+.num{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;border-radius:7px;background:var(--ink);color:#fff;font-weight:800;font-size:13px;padding:0 6px}
+.when{font-size:12px;color:var(--muted)}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px}
+.meta div{background:var(--tint);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;line-height:1.5}
+.meta span{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.03em;margin-bottom:2px}
+ul.dot li,ol.n li{position:relative;padding-left:14px;margin:3px 0}
+ul.dot{list-style:none;padding:0}
+ul.dot li::before{content:"";position:absolute;left:2px;top:.68em;width:4px;height:4px;border-radius:50%;background:var(--ink)}
+ol.n{padding-left:20px}
+ol.n li{padding-left:2px}
+.chk{list-style:none;padding:0}
+.chk li{display:grid;grid-template-columns:22px 92px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.chk li:last-child{border-bottom:0}
+.chk .box{width:15px;height:15px;border:1.5px solid var(--faint);border-radius:3px;margin-top:4px}
+.chk .d{font-size:12px;color:var(--muted);padding-top:1px}
+.fill{display:inline;background:var(--warnbg);color:var(--warn);font-weight:700;border-radius:4px;padding:0 4px;font-size:.92em}
+.qa{border-top:1px solid var(--line);padding:12px 0}
+.qa:first-of-type{border-top:0}
+.q{font-weight:750;color:var(--ink);font-size:14px}
+.q .sc{font-size:11px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px;margin-left:6px;white-space:nowrap}
+.a{margin-top:5px}
+.a p+p{margin-top:5px}
+.tail{margin-top:7px;font-size:12.5px;color:var(--muted);background:var(--tint);border-left:3px solid var(--faint);padding:6px 10px}
+.tail b{color:var(--muted)}
+.en{font-family:Pretendard,-apple-system,'Helvetica Neue',Arial,sans-serif;word-break:normal}
+.mail{background:var(--tint);border-left:3px solid var(--ink);padding:12px 14px;font-size:13.5px;margin-top:8px}
+.mail .subj{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.mail .subj b{color:var(--ink)}
+.mail p+p{margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.5;margin-top:6px}
+th{text-align:left;font-size:11.5px;color:var(--muted);font-weight:700;border-bottom:1px solid var(--ink);padding:6px 8px 6px 0;vertical-align:bottom}
+td{border-bottom:1px solid var(--line);padding:7px 10px 7px 0;vertical-align:top}
+td:first-child{font-weight:700;color:var(--ink)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.map{min-width:640px}
+.pill{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:0 6px}
+.pill.hi{background:#e7f5ec;color:var(--ok)}
+.pill.mid{background:var(--warnbg);color:var(--warn)}
+.note{font-size:12.5px;color:var(--muted);margin-top:8px}
+.callout{background:var(--ink);color:#e6e9ed;border-radius:12px;padding:16px 18px;margin-top:16px}
+.callout h2{color:#fff}
+.callout b{color:#fff}
+.callout .y{color:var(--mark)}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.toc a{font-size:12px;text-decoration:none;border:1px solid var(--line);background:#fff;border-radius:6px;padding:2px 8px;color:var(--body)}
+.src{font-size:11.5px;color:var(--faint);margin-top:24px;line-height:1.7}
+@media (max-width:640px){.meta{grid-template-columns:1fr}.chk li{grid-template-columns:22px 1fr}.chk .d{grid-column:2}.card{padding:18px 16px}h1{font-size:22px}}
+@media print{html{background:#fff}.card{box-shadow:none;break-inside:avoid-page}}
+</style></head><body><main>
+
+<p class="eyebrow">CoeFont Korea B2B Sales &amp; Customer Success Manager · 2026-11-01 제출 · 오늘 2026-11-05(목), 제출 후 4일째</p>
+<h1>제출 이후부터 입사 90일까지:<br><mark>CoeFont 지원 여정 설계와 실행본</mark></h1>
+<p class="lead">지원자 입장에서 각 단계를 실제로 준비하고, Fable 어드바이저가 면접관 역할로 채점했습니다. 이 문서는 그 결과를 반영한 v2입니다.</p>
+<p class="note">노란 칸 <span class="fill">【확인】</span>은 본인만 아는 사실을 채우는 자리입니다. 지어내지 않았습니다. CoeFont의 채용 절차는 공개 정보가 없어서, 아래 단계는 일본 스타트업 해외 1호 채용에서 흔한 흐름을 가정한 것입니다.</p>
+<nav class="toc"><a href="#facts">먼저 채울 사실</a><a href="#map">여정 지도</a><a href="#s0">0 대기</a><a href="#s1">1 캐주얼 면담</a><a href="#s2">2 실무 면접</a><a href="#s3">3 자발 과제</a><a href="#s4">4 최종</a><a href="#s5">5 레퍼런스·오퍼</a><a href="#s6">6 입사 90일</a><a href="#review">채점 기록</a></nav>
+
+<section class="callout" id="facts">
+<h2>먼저 채울 사실 9개 <span class="y">(11/7 금까지)</span></h2>
+<p style="margin-top:4px">어드바이저 판단으로는 1단계 통과 여부가 거의 이 칸들로 갈립니다. 특히 ①·②가 비어 있으면 1단계에서 끝날 수 있습니다.</p>
+<ol class="n" style="margin-top:8px">
+<li><b>CoeFont 통역 직접 사용 기록</b>: 한–영 통화 1회 이상을 Teams/Zoom 자막과 나란히 비교. 체험이 막혀 있으면 "체험 신청 후 승인 대기"라고 사실대로.</li>
+<li><b>핑퐁 퇴사 사유 1문장</b>과, 핑퐁 상사가 레퍼런스로 같은 설명을 할지 여부</li>
+<li><b>2025.09–2026.05 사이에 한 일</b>: 지원했던 곳과 가지 않은 이유까지 한 줄로</li>
+<li><b>자리별 퇴사 사유 한 줄씩</b>: 앤메이커스, 콘센트릭스, 피더블유케이</li>
+<li><b>B2B 영업 경력 연수</b>와 총 경력 연수(겹치는 임시직은 빼고 계산)</li>
+<li><b>핑퐁 퍼널 숫자</b>: 접촉 몇 건 → 미팅 몇 건 → 계약 3건. 개인 쿼터가 있었는지, 거래액은 범위로라도.</li>
+<li><b>일본어 현재 수준</b>: 학습 중이 아니면 학습 계획은 쓰지 않기</li>
+<li><b>연봉 3개 선</b>(내부용): 최소선, 희망선, 처음 말할 범위. 직전 연봉은 먼저 말하지 않음.</li>
+<li><b>입사 가능일</b>: 가능하면 "즉시, 준비 1주"</li>
+</ol>
+</section>
+
+<section class="card" id="map">
+<h2>여정 지도</h2>
+<p class="note" style="margin-top:0">단계와 면접관 예상은 Fable 어드바이저와 함께 설계했습니다. 처음 설계한 7단계에 캐주얼 면담과 고용 형태 확인을 넣었고, 레퍼런스 체크는 최종 면접 전으로 당겼습니다. 과제는 요청이 없어도 자발적으로 내는 것으로 바꿨습니다.</p>
+<div class="scroll"><table class="map">
+<thead><tr><th style="width:15%">단계 · 예상 시점</th><th style="width:20%">상대</th><th style="width:22%">상대의 가장 큰 걱정</th><th style="width:23%">통과 기준</th><th>내 산출물</th></tr></thead>
+<tbody>
+<tr><td>0 대기<br><span class="when">11/5–11/14</span></td><td>—</td><td>—</td><td>후속 메일에 '제품을 써 본 흔적'이 있어 열어 볼 이유가 생김</td><td>사용 로그 1장 · 타깃 20 · 후속 메일</td></tr>
+<tr><td>1 캐주얼 면담·스크리닝<br><span class="when">11월 중순, 30분</span></td><td>본사 HR 또는 해외사업 담당</td><td>"1년 안에 또 나가지 않을까"</td><td>공백·퇴사 사유를 막힘 없이 1문장씩 · 영어 업무 가능 · 기대치가 예산 안</td><td>1분 소개 · 6문답 · 역질문 3</td></tr>
+<tr><td>2 실무 면접<br><span class="when">+1주, 60분</span></td><td>글로벌 BD 책임자(한국 리드가 아직 없을 가능성 큼)</td><td>"한국 시장을 모르는 내가 이 사람 말을 검증할 수 있나"</td><td>역으로 질문하는지 · 모르는 걸 모른다고 하는지 · 반론에 숫자로 답하는지</td><td>8문답 · 디스커버리 6문항 · 반론 카드</td></tr>
+<tr><td>3 자발 과제<br><span class="when">2단계 후 48시간</span></td><td>2단계와 같은 사람</td><td>"서류만 그럴듯한가, 손이 빠른가"</td><td>타깃 20개가 리스트가 아니라 우선순위·근거·첫 메시지로 되어 있음</td><td>타깃 20 → 상위 5 · 보안 질의 목록</td></tr>
+<tr><td>3.5 레퍼런스<br><span class="when">최종 전일 수 있음</span></td><td>핑퐁 상사 등</td><td>—</td><td>본인 설명과 레퍼런스의 설명이 <b>일치</b>함</td><td>레퍼런스 사전 브리핑</td></tr>
+<tr><td>4 최종(도쿄, 영어)<br><span class="when">+2–3주, 45분</span></td><td>CEO 또는 사업 책임자</td><td>"요구를 그대로 전하기만 하나, 이유를 설명하나" · "혼자 6개월 버티나"</td><td>CEO와 영어로 반론을 주고받음 · 피드백을 구조화함</td><td>3분 피치 · 90일 계획 · 역질문</td></tr>
+<tr><td>5 오퍼<br><span class="when">최종 후 1주</span></td><td>HR · 사업 책임자</td><td>수락 의지</td><td>3–5영업일 안에 근거를 갖고 결정</td><td>협상 체크리스트</td></tr>
+<tr><td>6 입사·90일<br><span class="when">시용기간</span></td><td>보고 라인</td><td>"한국에서 정말 팔리나"</td><td>판정 근거가 있는 PoC 결과</td><td>30·60·90 평가표</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="card" id="s0">
+<div class="stage-head"><span class="num">0</span><h2>대기 기간: 기다리지 않고 과제를 먼저 만듭니다</h2><span class="when">11/5(목) – 11/14(토)</span></div>
+<ul class="chk">
+<li><span class="box"></span><span class="d">11/5–11/7</span><span>위의 <b>먼저 채울 사실 9개</b>를 채웁니다.</span></li>
+<li><span class="box"></span><span class="d">11/6–11/8</span><span><b>CoeFont 통역 사용 로그 1장</b>: 한–영 회의 1회(지인과라도)를 Teams/Zoom 자막과 나란히 켜고 표로 남깁니다. 열: 발화 · CoeFont 결과 · 자막 결과 · 오역/지연 · 고유명사(제품명·성분명). 무료 체험 범위는 <span class="fill">【확인】</span>.</span></li>
+<li><span class="box"></span><span class="d">11/8–11/9</span><span><b>한국 타깃 20개 만들기</b>: 이 저장소의 <code>run_coefont.command</code>를 더블클릭하면 다국어 회의가 늘어나는 한국 기업을 찾아 시트의 <code>coefont</code> 탭에 쌓습니다. 신호는 외국어 가능 해외영업 채용, 해외 법인 설립, 해외 파트너십, 해외 매출 다변화 네 가지입니다. 40개 후보 중 20개를 사람이 고르고, 상위 5개에 첫 메시지를 씁니다. (메시지 첫 문장 자동 생성은 영어로 나오므로 한국어로 다시 씁니다.)</span></li>
+<li><span class="box"></span><span class="d">11/10(화) 오전</span><span><b>후속 메일</b> 발송(제출 후 9일째, 아래 초안). 사용 로그 1장만 붙이고 포트폴리오는 다시 요약하지 않습니다.</span></li>
+<li><span class="box"></span><span class="d">11/10–11/14</span><span>LinkedIn에서 CoeFont 글로벌 BD·CS 직원 1–2명에게 <b>한국 사용자로서 제품 피드백 3개</b>를 보냅니다. 채용 얘기는 하지 않고, 답이 오면 그때 지원 사실을 밝힙니다.</span></li>
+<li><span class="box"></span><span class="d">11/14까지</span><span><b>면접 지참용 보강 1장</b>(제출본은 그대로 둡니다): ① 핑퐁 퍼널 숫자 카드, ② 브이티 판정 규칙에 4번째 지표 "제품·성분명 오역 건수" 추가, ③ 브이티 가설이 깨지면 달바글로벌로 넘어가는 조건 1줄.</span></li>
+</ul>
+
+<h3>후속 메일 초안 (한국어)</h3>
+<div class="mail">
+<p class="subj"><b>제목</b> B2B Sales &amp; CSM 지원 최다영 · 제출 후 CoeFont 통역을 직접 써 본 기록 1장</p>
+<p>안녕하세요, 11월 1일 CoeFont Korea B2B Sales &amp; Customer Success Manager에 지원한 최다영입니다.</p>
+<p>제출 후 CoeFont 통역을 한–영 회의에서 직접 써 보고, 같은 회의를 Teams 자막과 나란히 비교한 기록을 1장으로 정리해 첨부합니다. <span class="fill">【확인: 실제 결과 1문장 — 예: "일상 대화는 차이가 작았고, 제품명·고유명사에서 차이가 컸습니다."】</span> 지원서의 브이티 PoC 계획에서 1회차를 이렇게 비교하겠다고 쓴 것을 먼저 해 본 것입니다.</p>
+<p>검토에 참고가 되면 좋겠습니다. 감사합니다.<br>최다영 드림 · chloe.dayoung@gmail.com</p>
+</div>
+<h3>같은 메일 (English, 일본 본사 담당자일 때)</h3>
+<div class="mail en">
+<p class="subj"><b>Subject</b> Dayoung Choi, B2B Sales &amp; CSM (Korea): a one-page test log of CoeFont Interpreter</p>
+<p>Hello, I applied for the B2B Sales &amp; Customer Success Manager role for Korea on November 1.</p>
+<p>Since then I used CoeFont Interpreter in a Korean–English call and ran Teams live captions side by side on the same call. The one-page log is attached. <span class="fill">【fill in: one-line result】</span> It is the first-session comparison I proposed in my VT PoC plan, done ahead of time.</p>
+<p>I hope it is useful for your review. Thank you.<br>Dayoung Choi · chloe.dayoung@gmail.com</p>
+</div>
+</section>
+
+<section class="card" id="s1">
+<div class="stage-head"><span class="num">1</span><h2>캐주얼 면담·스크리닝</h2><span class="when">30분 · 본사 HR 또는 해외사업 담당</span></div>
+<p class="note" style="margin-top:0">일본 스타트업의 캐주얼 면담(カジュアル面談)은 평가가 없다고 해도 사실상 첫 필터인 경우가 많습니다. 면접처럼 준비합니다.</p>
+
+<div class="qa"><p class="q">1분 자기소개<span class="sc">v1 4점</span></p><div class="a">
+<p>B2B 고객이 결제사를 바꾸지 않는 이유는 대개 가격이 아니라 "바꾸면 우리 일이 늘어난다"였습니다. 저는 그 일을 대신 맡아 계약을 만들어 온 세일즈입니다. 경력은 약 <span class="fill">【확인】</span>년이고, 그중 B2B 영업이 <span class="fill">【확인】</span>년, 나머지는 구매와 품질 관리였습니다.</p>
+<p>핑퐁페이먼트에서는 해외 판매를 막 넓히는 회사를 채용공고·진출 기사 같은 신호로 찾아 올리브영 카테고리 1위 브랜드 3곳과 계약했고, 발굴부터 KYC 심사, 온보딩, 사후 CS까지 혼자 끝까지 맡았습니다. 반복되는 일은 시트와 스크립트로 바꿨고, 제가 제안한 건 단위 요청 로그는 이후 회사가 티켓 시스템을 도입하는 데까지 이어졌습니다.</p>
+<p>CoeFont 한국 1호 영업은 고객도, 레퍼런스도, 한국어 자료도 없는 데서 시작하는 자리라고 봅니다. 고객을 찾는 기준과 반복 업무를 처음부터 구조로 만드는 사람이 필요한 자리라서 지원했습니다.</p>
+</div><p class="tail"><b>꼬리 질문</b> "총 경력에서 B2B 영업은 몇 년인가요?" → 둘째 문장에 미리 답해 둠</p></div>
+
+<div class="qa"><p class="q">왜 CoeFont이고, 왜 지금인가<span class="sc">v1 3점</span></p><div class="a">
+<p>세 가지입니다. 첫째, 한국 수출 기업들은 일본 다음 시장으로 넓히고 있어서 언어가 하나 늘 때마다 회의도 늘어납니다. 브이티 IR에 "일본 편중 다변화"가 과제로 적혀 있는 것이 그 예입니다. 둘째, 그 회의를 지금은 이중언어 직원이 중계하고 있어서, 비교 대상은 통역사비가 아니라 직원의 시간입니다. 셋째, KOSE처럼 같은 업종에서 통역사 예약 회의를 대체하고 해외 법인까지 넓힌 사례가 이미 있습니다.</p>
+<p>그리고 2025년 11월에 한국어가 지원되기 시작했고, iOS 출시 한 달 만에 일본 App Store 번역 1위를 했습니다. 한국 시장에 쓸 제품이 준비된 첫해가 지금이라고 봅니다. <span class="fill">【확인: 직접 써 본 결과 1문장】</span></p>
+</div><p class="tail"><b>꼬리 질문</b> "직접 써 보셨나요? 어디가 틀렸나요?" → 0단계의 사용 로그가 답</p></div>
+
+<div class="qa"><p class="q">핑퐁은 왜 8개월 만에 나왔고, 그 뒤 15개월은 무엇을 했나<span class="sc">v1 3점</span></p><div class="a">
+<p>핑퐁을 떠난 이유는 <span class="fill">【확인: 사실 그대로 1문장. 레퍼런스의 설명과 같아야 함】</span>.</p>
+<p>그 뒤로는 영업 현장에서 반복하던 일을 도구로 만드는 데 시간을 썼습니다. KYC 단계별 안내 발송 시트를 Apps Script로 다시 만들어 AI 실무자 커뮤니티 GPTers의 스터디에서 투표 2위를 했고, 영업 온보딩 킷을 GitHub에 공개했습니다. 올해 6월부터는 Claude Code로 공개 웹에서 잠재 고객을 찾고 신호를 구조화해 시트에 쌓는 리서치 도구를 만들어 직접 쓰고 있습니다. 이번 지원서의 브이티 자료도 그 도구로 모았습니다. <span class="fill">【확인: 2025.09–2026.05에 한 일, 지원했던 곳과 가지 않은 이유 1줄】</span></p>
+<p>그래서 이번에는 제가 만든 구조가 곧 회사의 구조가 되는 1호 자리를 찾았습니다.</p>
+</div><p class="tail"><b>꼬리 질문</b> "핑퐁도 처음부터 만드는 자리 아니었나요?" → v1의 마지막 문장이 이 질문을 불러서 고쳤습니다. 다른 자리의 퇴사 사유도 한 줄씩 준비(먼저 채울 사실 ④).</p></div>
+
+<div class="qa"><p class="q">일본어는 어느 정도인가<span class="sc">v1 4점</span></p><div class="a">
+<p><span class="fill">【확인: 현재 수준을 정확히】</span>. 도쿄 본사와는 영어로 일하겠습니다. 앤메이커스에서 한국인 동료 없이 미국 본사와 영어로만 일했습니다. 일본어 문서는 번역기로 읽고, 결정 사항은 영어로 다시 확인해서 오해를 막겠습니다.</p>
+<p>그리고 CoeFont가 바로 그 문제를 푸는 제품이니, 본사와의 일본어 회의는 CoeFont를 켜고 하겠습니다. 그러면 제가 매주 제품을 가장 혹독하게 쓰는 한국 사용자가 되고, 그 기록이 그대로 프로덕트 피드백이 됩니다.</p>
+</div><p class="tail"><b>꼬리 질문</b> "본사 Slack·노션은 일본어인데요?" → 둘째 문장. 학습 계획은 실제로 시작한 경우에만 말합니다.</p></div>
+
+<div class="qa"><p class="q">희망 연봉<span class="sc">v1 3점</span></p><div class="a">
+<p>먼저 이 자리의 보상 구조, 즉 기본급과 변동급 비율, 변동급 기준, 계약 주체를 여쭙고 싶습니다. 1호 영업은 쿼터 기준이 아직 없을 수 있어서, 같은 총액이라도 구조에 따라 의미가 많이 달라집니다. 구조를 듣고 조정하겠지만, 지금은 기본급 기준 <span class="fill">【확인】</span>~<span class="fill">【확인】</span> 범위를 보고 있습니다.</p>
+</div><p class="tail"><b>꼬리 질문</b> "직전 연봉은요?" → "지금은 공백 중이라 직전 연봉보다 시장 기준으로 말씀드리겠습니다." 범위를 끝까지 말하지 않으면 협상이 어려운 사람으로 보입니다.</p></div>
+
+<div class="qa"><p class="q">입사 가능일<span class="sc">v1 2점</span></p><div class="a"><p>즉시 가능합니다. 준비에는 1주면 충분합니다. <span class="fill">【확인】</span></p></div></div>
+
+<h3>내가 묻는 것 (이 순서로)</h3>
+<ol class="n">
+<li>이후 전형 단계와 일정, 각 면접의 언어를 여쭤봐도 될까요?</li>
+<li>근무지(한국 오피스가 있는지)와 보고 라인은 어떻게 되나요?</li>
+<li>계약 주체는 일본 본사 직접 고용인가요, EOR(Deel·Remote 같은 대리 고용)인가요, 업무 위탁인가요? <span class="note">← 오퍼 전에 반드시 확인. 형태에 따라 4대보험·퇴직금·연차가 달라짐</span></li>
+</ol>
+</section>
+
+<section class="card" id="s2">
+<div class="stage-head"><span class="num">2</span><h2>실무 면접</h2><span class="when">60분 · 글로벌 BD 책임자</span></div>
+<p class="note" style="margin-top:0">면접관은 한국 시장을 직접 검증하기 어렵습니다. 그래서 출처와 숫자, 멈춤 조건을 계속 보여 줍니다. 이 단계의 핵심 답은 SaaS 차이 질문(v1 5점)입니다.</p>
+
+<div class="qa"><p class="q">쿼터는 얼마였고, 달성률은?<span class="sc">v1 3점</span></p><div class="a">
+<p>개인 매출 쿼터는 <span class="fill">【확인: 있었다/없었다】</span>. 제가 관리한 숫자는 접촉 <span class="fill">【확인】</span>건 → 미팅 <span class="fill">【확인】</span>건 → 계약 3건이고, 첫 연락부터 계약까지 1.5~2개월이었습니다. 거래액은 <span class="fill">【확인: 범위로라도】</span>입니다.</p>
+<p>결제 영업은 계약 뒤에 실제 거래가 흘러야 매출이 되기 때문에, 저는 계약 수보다 온보딩을 끝내고 첫 정산이 나간 고객 수를 더 중요하게 봤습니다. 그중 2곳은 제가 직접 온보딩했습니다.</p>
+</div><p class="tail"><b>꼬리 질문</b> "3건 계약하는 데 몇 곳에 접촉했나요?" → 퍼널 숫자가 이 답의 전부입니다. 비어 있으면 8개월에 3건으로만 보입니다.</p></div>
+
+<div class="qa"><p class="q">SaaS를 팔아 본 적이 없다. 결제 영업과 무엇이 다른가?<span class="sc">v1 5점</span></p><div class="a">
+<p>공통점부터 말씀드리면, 둘 다 계약서에 서명한 날이 아니라 고객이 실제로 쓰기 시작한 날부터 매출이 생깁니다. 결제는 거래가 흘러야, CoeFont는 회의에서 켜야 매출이 됩니다.</p>
+<p>다른 점은 세 가지로 봅니다. ① 매출 단위가 거래액이 아니라 좌석과 사용 시간이라, 확대는 다른 부서가 쓰기 시작할 때 일어납니다. ② 결제는 한 번 연결되면 잘 바뀌지 않지만, 통역 도구는 회의마다 켤지 말지를 사람이 정합니다. 매번 선택받아야 해서, PoC 판정 지표를 "켠 회의 수"로 잡았습니다. ③ 보안 검토의 대상이 자금 흐름에서 회의 음성·기록의 처리 위치·보관·삭제로 바뀝니다. 핑퐁에서 KYB 규정의 목적을 거슬러 확인하고 대체 증빙으로 승인받았던 방식을 그대로 쓰겠습니다.</p>
+</div><p class="tail"><b>꼬리 질문</b> "고객이 안 켜게 되는 가장 흔한 이유는?" → "한 번의 오역으로 신뢰가 깨지는 것, 그리고 지연. 그래서 1회차 용어 준비와 지연 측정을 PoC에 넣었습니다."</p></div>
+
+<div class="qa"><p class="q">브이티는 일본어 직원이 많을 텐데, 통역기가 왜 필요한가?<span class="sc">v1 4점</span></p><div class="a">
+<p>맞습니다. 그래서 일본어 통역은 팔지 않습니다. 브이티는 일본어 문제를 채용으로 이미 풀었습니다. 제가 파는 건 두 종류의 회의입니다. 하나는 일본어 직원이 들어가지 않는 부서의 일본 쪽 회의, 예를 들어 R&amp;D·품질·생산이 일본 파트너와 하는 회의입니다. 다른 하나는 IR과 보도에 나온 일본 다음 시장, 미국·중국·러시아·남미 파트너와의 회의입니다.</p>
+<p>일본어 직원은 보통 영업·마케팅 소속이라 R&amp;D 회의에 매번 들어가기 어렵다는 것도 1주차에 확인할 가설입니다. 이 가설이 20분 통화에서 틀리면, 즉 두 회의가 모두 월 2회 미만이면 브이티는 멈추고 일본 밖 시장 비중이 더 큰 달바글로벌로 넘어갑니다.</p>
+</div><p class="tail"><b>꼬리 질문</b> "R&amp;D 회의에 일본어 직원을 부르면 되지 않나요?" → 둘째 문단. 시장 이름은 제출본 출처(한국경제 2026-04-29, 2025 반기 IR)에서 다시 확인하고 말합니다.</p></div>
+
+<div class="qa"><p class="q">용어집은 Enterprise 전용인데, PoC에서 성분명이 틀리면?<span class="sc">v1 4점</span></p><div class="a">
+<p>그게 오히려 Enterprise로 가는 근거가 됩니다. PoC 1회차를 용어집 없는 기준선으로 두고 회의마다 제품명·성분명 오역 건수를 적습니다. 본사가 Enterprise 기능 체험을 승인하면 2회차부터 용어집을 켜고 같은 지표를 비교합니다. 고객이 직접 "이 차이 때문에 Enterprise가 필요하다"고 말하게 만드는 구조입니다.</p>
+<p>체험 승인이 나지 않으면 오역 건수에 회의당 재확인 시간을 곱해 금액으로 환산하고, 그걸 협상 근거로 씁니다.</p>
+</div></div>
+
+<div class="qa"><p class="q">한국 고객 사례가 없다. 첫 레퍼런스는 어떻게 만드나?<span class="sc">v1 4점</span></p><div class="a">
+<p>첫 미팅에서는 KOSE 사례를 그대로 씁니다. 같은 업종이고, 통역사 예약 회의를 대체한 뒤 아시아사업부·태국 법인으로 넓힌 경로가 브이티와 겹칩니다. 첫 3개 고객에게는 할인보다 "PoC 결과표를 익명으로라도 공동 사례로 쓴다"는 조건을 먼저 제안하겠습니다. 할인은 다음 고객이 기준으로 삼지만, 사례는 다음 고객을 데려옵니다.</p>
+<p>공개를 거부하면 익명 수치만 쓰고, 그것도 어려우면 레퍼런스 콜 1회로 조건을 낮춰 교환합니다. 할인 권한과 사례화 조건은 본사와 먼저 맞추겠습니다.</p>
+</div></div>
+
+<div class="qa"><p class="q">영업 → 품질 관리 → 구매 → 영업. 커리어의 축은?<span class="sc">v1 4점</span></p><div class="a">
+<p>자리마다 상대는 바뀌었지만 한 일은 같았습니다. 규칙이 왜 있는지 파악하고, 반복되는 일을 다른 사람도 쓰는 구조로 만들었습니다. 콘센트릭스의 16명 분배 수식은 제가 나간 뒤에도 쓰였고, 피더블유케이의 선급금 50% 조건은 표준 관행이 됐고, 핑퐁의 리드 분배 시트는 회사 전체가 썼습니다. T&amp;S 업무에서 규정의 목적을 보는 습관이 생겼고, 그 습관이 핑퐁의 KYB 승인으로 이어졌습니다.</p>
+<p>1호 영업 자리는 고객, 규정, 구조가 모두 한 사람에게 걸리는 자리라서, 제 경력이 처음으로 한 자리에 모인다고 봅니다.</p>
+</div><p class="tail"><b>꼬리 질문</b> "셋 다 2년 미만인데, 왜 떠났나요?" → 축 설명만으로는 막을 수 없습니다. 자리별 퇴사 사유 한 줄씩(먼저 채울 사실 ④).</p></div>
+
+<div class="qa"><p class="q">롤플레이: 브이티 해외사업 총괄과의 디스커버리 첫 6문항<span class="sc">v1 4점</span></p><div class="a"><ol class="n">
+<li>올해 새로 연 시장 중에 파트너 회의가 가장 잦은 곳은 어디인가요?</li>
+<li>그 회의는 지금 누가 통역하거나 중계하나요? 그분은 원래 무슨 일을 하는 분인가요?</li>
+<li>지난달 언어 때문에 미뤄졌거나 사람을 더 넣어야 했던 회의가 있었나요?</li>
+<li>그 회의는 Teams·Zoom·대면 중 어떤 방식으로 하시나요?</li>
+<li>회의 내용을 외부 서비스로 보내는 데 사내 규정이 있나요? 누가 승인하나요?</li>
+<li>이게 풀리면 가장 먼저 편해질 사람은 누구고, 예산은 누가 갖고 있나요?</li>
+</ol></div><p class="tail"><b>고객 반론</b> "우리는 그냥 영어로 합니다." → "그 회의에서 영어가 불편한 참석자가 있나요? 그분은 회의 뒤에 누구에게 다시 물어보나요?"</p></div>
+
+<div class="qa"><p class="q">반론: "Teams 번역 자막은 공짜인데요?"<span class="sc">v1 4점</span></p><div class="a">
+<p>맞습니다. 자막만 필요하시면 Teams로 충분합니다. 그래서 PoC 1회차는 Teams 자막과 나란히 켜서 비교하자고 제안드립니다. 차이가 날 곳은 두 군데로 봅니다. 하나는 리들샷 같은 제품명과 성분명이고, 다른 하나는 상대가 자막을 읽지 않고 음성으로 듣는 회의입니다.</p>
+<p>판정 기준은 미리 합의하겠습니다. 예를 들어 제품명·성분명 오역이 <span class="fill">【기준 숫자: 예 절반】</span> 이하로 줄지 않으면 차이가 없다고 보고, 그때는 계약을 권하지 않겠습니다.</p>
+</div></div>
+</section>
+
+<section class="card" id="s3">
+<div class="stage-head"><span class="num">3</span><h2>자발 과제: 실무 면접 후 48시간 안에</h2><span class="when">"요청하지 않으셨지만"으로 보냄</span></div>
+<ul class="dot">
+<li><b>한국 타깃 20개 → 상위 5개</b>: 0단계에서 만든 시트를 표로. 열: 회사 · 신호(출처 링크) · 늘어나는 회의 종류 · 첫 연락 대상 직함 · 첫 메시지 1문장 · 멈춤 조건.</li>
+<li><b>보안 질의 목록(답은 비워 둠)</b>: 음성 처리 위치(리전) · 저장 여부와 보관 기간 · 삭제 요청 절차 · 학습 데이터 사용 여부 · 열람 권한·접근 로그 · 재위탁 업체 · 인증(ISMS-P 등 한국 고객이 묻는 항목). 답 칸은 "본사 확인 필요"로 남겨, 입사하면 가장 먼저 채울 문서라는 것을 보여 줍니다.</li>
+<li><b>보강 1장</b>: 퍼널 숫자 카드, 판정 규칙 4번째 지표(오역 건수), 브이티에서 달바글로벌로 넘어가는 조건.</li>
+</ul>
+<p class="note">메일 첫 문장 예: "면접에서 말씀드린 타깃 기준으로 실제 계정 20개를 뽑아 봤습니다. 상위 5개와 그 근거를 붙입니다. 답이 비어 있는 보안 질의 목록은 입사 후 가장 먼저 본사와 채울 문서입니다."</p>
+</section>
+
+<section class="card" id="s35">
+<div class="stage-head"><span class="num">3.5</span><h2>레퍼런스 체크 대비</h2><span class="when">최종 면접 전에 할 수도 있음</span></div>
+<ul class="dot">
+<li>2단계가 끝나면 바로 레퍼런스 후보(핑퐁 상사 1명, 앤메이커스 또는 피더블유케이 1명)에게 연락합니다. "CoeFont 한국 1호 B2B 영업에 지원했고, 연락이 갈 수 있다"고 알립니다.</li>
+<li>함께 맞춰 둘 것: 담당 범위(발굴~CS 전 과정), 대표 성과 2개(카테고리 1위 3곳 계약, KYB 대체 증빙 → 나머지 플랫폼 이전), <b>퇴사 사유는 본인이 면접에서 한 말과 같은 문장</b>.</li>
+<li>이 단계의 기준은 내용보다 <b>일치</b>입니다.</li>
+</ul>
+</section>
+
+<section class="card" id="s4">
+<div class="stage-head"><span class="num">4</span><h2>최종 면접 (도쿄, 영어)</h2><span class="when">45분 · CEO 또는 사업 책임자</span></div>
+
+<div class="qa"><p class="q">3-minute pitch<span class="sc">v1 4점</span></p><div class="a en">
+<p>In Korea, the fastest-growing meetings are not the Japanese ones. Korean exporters have already solved for Japanese by hiring bilingual staff. What they haven't solved is the next market. VT, the company behind Reedle Shot, makes over half its revenue in Japan, and its IR lists reducing that dependence as a goal while it expands into new markets. Every new market adds partner meetings in a new language, and today a bilingual employee relays them.</p>
+<p>So I wouldn't sell interpretation against interpreter fees. I'd sell meetings that no longer need a relay person, and I'd measure it by how many meetings the customer actually turns CoeFont on for.</p>
+<p>In my first 90 days I'd deliver three things: one PoC in K-beauty using KOSE as the reference, a Korean security Q&amp;A pack built with your team so the second customer gets answers in days, not weeks, and a weekly product feedback log in a format your product team can prioritize directly.</p>
+<p>Why me: at PingPong I found the customer, took them through compliance review, onboarded them, and stayed on as their point of contact. I signed three category leaders in a market where the leading competitor already held the customers and channels, not by discounting but by taking work off the customer's plate. When the same work repeated, I turned it into tools the whole company used. A first hire in a new country needs to do both.</p>
+</div><p class="tail"><b>꼬리 질문</b> "Who is the relay person at VT today? Have you spoken to them?" → "No, I haven't contacted VT. That's my first-week question, and if the answer is fewer than two such meetings a month, I move on to the next account."</p></div>
+
+<div class="qa"><p class="q">What will you do when you disagree with Tokyo HQ?<span class="sc">v1 4점</span></p><div class="a en">
+<p>I'll bring the customer's words, not my opinion: the exact quote, how many meetings it blocked, and what they did instead. If the answer is still no, I'll go back to the customer quickly with a clear answer and a workaround. A fast no is better than a slow maybe.</p>
+<p>At PingPong, a marketplace's rule required ID documents from every owner of a customer with a multi-layer ownership structure, which they couldn't easily provide. I didn't argue against the rule. I asked what it was meant to confirm, which was effective control, and brought public DART filings as equivalent evidence. Compliance approved it with no extra paperwork, and that customer then moved its remaining platforms over from the market leader.</p>
+</div><p class="tail"><b>꼬리 질문</b> "Tell me about a time you disagreed and lost." → <span class="fill">【확인: 실제 사례 1개. 졌을 때 고객에게 어떻게 전했는지까지】</span></p></div>
+
+<div class="qa"><p class="q">90일 계획 = 시용기간 평가 기준 제안<span class="sc">v1 4점</span></p><div class="a">
+<table><thead><tr><th style="width:16%">기간</th><th>할 일</th><th style="width:30%">평가 기준</th></tr></thead><tbody>
+<tr><td>Day 1–30</td><td>제품·보안 답변 숙지, 본사 답변으로 한국어 보안 FAQ v1 작성, 타깃 20 → 우선순위 5, 첫 미팅 3건</td><td>FAQ v1 완성 · 미팅 3건</td></tr>
+<tr><td>Day 31–60</td><td>PoC 1건 시작(판정 규칙 사전 합의), 디스커버리 10건, 반론·용어 로그 주간 보고</td><td>PoC 1건 진행 · 주간 피드백 로그 4회</td></tr>
+<tr><td>Day 61–90</td><td>PoC 판정 → 견적·협상, 다음 2개 계정 PoC 준비, 한국 온보딩 체크리스트 v1</td><td>유료 전환 1건, 또는 판정 근거가 있는 보류 1건 + PoC 파이프라인 2건</td></tr>
+</tbody></table>
+<p style="margin-top:8px"><b>본사에 필요한 것:</b> Day 1 보안 문서 영문본 · Day 30 Enterprise 체험 승인 권한 · Day 60 할인·사례화 조건 권한</p>
+</div><p class="tail"><b>꼬리 질문</b> "90일 뒤 유료 전환이 없으면, 당신 문제인지 시장 문제인지 어떻게 구분하나요?" → "PoC마다 켠 회의 수·지표·멈춘 이유를 판정표로 남깁니다. 켰는데 지표가 안 움직였다면 제품·시장 문제, 켜지도 않았다면 타깃 선정이 잘못된 것이니 제 문제입니다."</p></div>
+
+<h3>역질문</h3>
+<ol class="n en">
+<li>What numbers made you decide to enter Korea, and what number would tell you a year from now that this role worked?</li>
+<li>Which Korean companies are contacting you inbound today, and who handles them?</li>
+<li>When a Korean customer sends security questions, who on your side owns the answers?</li>
+</ol>
+</section>
+
+<section class="card" id="s5">
+<div class="stage-head"><span class="num">5</span><h2>오퍼와 협상</h2><span class="when">최종 후 약 1주</span></div>
+<table><thead><tr><th style="width:28%">확인할 것</th><th>왜</th></tr></thead><tbody>
+<tr><td>계약 주체</td><td>본사 직접 고용, EOR, 위탁에 따라 4대보험·퇴직금·연차가 달라집니다. 연봉보다 먼저 봅니다.</td></tr>
+<tr><td>기본급 : 변동급</td><td>1호 영업은 쿼터 기준이 없습니다. 변동급 산정 기준과 첫 2분기 보장 여부를 확인합니다. 보장이 없는 OTE(목표 달성 시 총보상)는 기본급만으로 평가합니다.</td></tr>
+<tr><td>통화</td><td>엔화 기준이면 환율 위험을 누가 지는지, 원화로 고정되는지 확인합니다.</td></tr>
+<tr><td>스톡옵션</td><td>금액보다 행사 조건과 베스팅을 먼저 봅니다. 일본 법인 스톡옵션을 한국 거주자가 받을 때의 세금은 <span class="fill">【세무 확인】</span>.</td></tr>
+<tr><td>시용기간</td><td>기간, 그 기간의 조건 차이, 평가 기준(4단계의 90일 표를 기준으로 쓰자고 제안)</td></tr>
+<tr><td>출장·장비·업무 공간</td><td>도쿄 출장 빈도와 비용 부담, 한국 오피스가 없을 때 코워킹 비용</td></tr>
+</tbody></table>
+<ul class="dot" style="margin-top:10px">
+<li><b>앵커</b>: 회사는 "1호 인력 프리미엄"보다 "SaaS 미경험 할인"을 먼저 꺼낼 가능성이 큽니다. 직전 연봉이 아니라 시장 범위로 먼저 제시합니다. 외국계 SaaS 한국 시니어 AE의 시장 범위는 <span class="fill">【확인: 헤드헌터나 동종 오퍼로 2곳 이상 교차 확인】</span>.</li>
+<li><b>결정 속도</b>: 최소선과 결정 기준을 오퍼 전에 정해 두고, 3–5영업일 안에 답합니다. 일본 스타트업은 긴 고민을 열의 부족으로 읽을 수 있습니다.</li>
+</ul>
+</section>
+
+<section class="card" id="s6">
+<div class="stage-head"><span class="num">6</span><h2>입사 전 1주와 첫 90일</h2><span class="when">시용기간</span></div>
+<ul class="dot">
+<li><b>입사 전 1주</b>: 타깃 시트를 회사 계정으로 옮길 준비, 보안 질의 목록을 영문으로 정리해 본사 창구에 첫날 보내기, 공개 도입 사례(KOSE 등)를 한국어 1장으로 요약</li>
+<li><b>주간 리듬</b>: 월요일 파이프라인 갱신(신호 리서치 자동 실행) · 수요일 본사 피드백 로그 발송(고객 원문 + 막힌 회의 수 + 대신 한 일) · 금요일 PoC 지표 기록</li>
+<li><b>평가</b>: 4단계의 30·60·90 표를 그대로 씁니다. 표 밖의 일이 생기면 그 주 금요일에 표를 고쳐 공유합니다.</li>
+</ul>
+</section>
+
+<section class="card" id="review">
+<h2>Fable 어드바이저와 상의한 기록</h2>
+<p class="note" style="margin-top:0">두 번 상의했습니다. 1차로 여정 설계를 비판받았고, 2차로 답변 초안 v1을 면접관 역할로 채점받았습니다. 이 문서의 답변은 그 피드백을 반영한 v2입니다.</p>
+<table><thead><tr><th style="width:24%">단계</th><th style="width:16%">v1 통과 예상</th><th>어드바이저가 짚은 점 → 반영</th></tr></thead><tbody>
+<tr><td>1 스크리닝</td><td><span class="pill mid">중간</span></td><td>제품 사용·퇴사 사유가 비면 탈락 → 먼저 채울 사실 ①②를 맨 위로 올림 · 연봉 범위를 끝까지 말하지 않는 답을 범위를 말하는 답으로 바꿈 · 입사일 "2주" → "즉시"</td></tr>
+<tr><td>2 실무</td><td><span class="pill hi">높음</span></td><td>퍼널 숫자 부족 → 접촉→미팅→계약 칸 추가 · Teams 반론에 사전 합의 판정 기준 추가 · 디스커버리에 회의 플랫폼 질문 추가</td></tr>
+<tr><td>4 최종</td><td><span class="pill mid">중간</span></td><td>영어 표현 다듬기("solved for Japanese", "stayed on as their point of contact") · 본사가 느리다는 뉘앙스 제거 · 이견 사례를 KYB 건으로 교체 · 90일 계획에 "본사에 필요한 것" 추가</td></tr>
+</tbody></table>
+<p class="note"><b>어드바이저 의견을 받아들이지 않은 곳:</b> 어드바이저는 "미국·러시아·남미", "글로벌 컴플라이언스 팀", "경쟁사의 채널 선점"을 근거 없는 표현으로 보고 지우라고 했습니다. 제출 서류와 대조해 보니 셋 다 원문에 출처와 함께 있었습니다(브이티 IR·한국경제, 사례 3, 사례 1의 조건). 그래서 지우지 않고 서류의 표현에 맞춰 다듬었습니다. 다만 면접 전에 출처를 다시 열어 확인하는 것은 그대로 할 일로 남깁니다.</p>
+</section>
+
+<p class="src">공개 자료: CoeFont 통역 한국어 지원(2025-11 기준)·iOS 2025-09 출시 및 일본 App Store 번역 1위 — <a href="https://aismiley.co.jp/ai_news/coe-font-cir-ai/">AIsmiley</a>, <a href="https://dxmagazine.jp/?p=171846">DX Magazine</a> · 누적 9.2만 시간 — <a href="https://aeo.washinmura.jp/ai/coefont-cloud/en/news/2026-04-21-ai-real-time-translation-coefont-interpr">2026-04 보도자료</a> · 회사 개요 — <a href="https://getlatka.com/companies/coefont.cloud">Latka</a> · 브이티·KOSE·요금·Teams 출처는 제출본 5쪽과 같습니다. CoeFont 채용 절차와 한국 법인 여부는 공개 자료로 확인되지 않았고, coefont.com 채용 페이지는 이 작업 환경의 네트워크 제한으로 열지 못했습니다.</p>
+</main></body></html>
