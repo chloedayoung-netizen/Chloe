@@ -1,0 +1,71 @@
+# ============================================================
+# CoeFont 한국 타깃 계정 리서치 설정
+# 다국어 회의가 '막 늘어나는' 한국 기업을 공개 신호로 찾는다.
+#   신호 ① 일본어/외국어 가능 해외영업 채용  ② 해외 법인 설립
+#       ③ 해외 파트너십·합작 발표           ④ IR의 해외 시장 다변화 언급
+# 실행: python main.py --config config.coefont.yaml --tab coefont
+# 결과는 시트의 coefont 탭에 저장된다. 우선순위·첫 메시지는 사람이 정한다.
+# ============================================================
+
+queries:
+  - '{category} {country} 해외영업 채용 외국어 가능자 우대 2026'
+  - '{category} {country} 법인 설립 2026'
+  - '{category} {country} 진출 파트너십 체결 2026'
+  - '{category} {country} 수출 확대 해외 매출 비중 다변화'
+
+# 이 칸은 '시장(언어)'으로 쓴다. 일본 다음 시장으로 넓히는 회사를 찾기 위함.
+countries:
+  - "일본"
+  - "미국"
+  - "중국"
+
+categories:
+  - "화장품"
+  - "K-뷰티 브랜드"
+  - "식품"
+  - "게임"
+
+search:
+  results_per_query: 10
+  language: "ko"
+  country_code: "kr"
+  max_total_urls: 40
+
+fetch:
+  timeout_seconds: 15
+  max_content_chars: 12000
+  user_agent: "Mozilla/5.0 (compatible; BuyerResearchBot/1.0; +https://example.com/bot)"
+  blocked_domains:
+    - "linkedin.com"
+    - "instagram.com"
+    - "facebook.com"
+    - "twitter.com"
+    - "x.com"
+    - "tiktok.com"
+    - "pinterest.com"
+    - "youtube.com"
+    - "namu.wiki"
+    - "wikipedia.org"
+
+extract:
+  temperature: 0
+  our_brand_context: >
+    We sell CoeFont, a real-time AI interpretation service for online and
+    in-person meetings (Japanese, English, Chinese, Korean and more). Our
+    best buyers are Korean exporters whose cross-language meetings are growing:
+    they are opening overseas subsidiaries, signing foreign partners, or hiring
+    bilingual staff to relay meetings. We do not sell against interpreter fees;
+    we sell meetings that no longer need a bilingual employee as the relay.
+  # ★ 타깃 정의: 한국 기업이고, 다국어 회의가 늘어날 신호가 있는지
+  target_definition: >
+    A relevant target is a single Korean company (beauty, food, games or other
+    exporters) whose page shows a signal that its cross-language meetings are
+    growing: a job posting for overseas sales requiring Japanese/English/Chinese,
+    a new overseas subsidiary or office, a newly announced foreign partnership,
+    joint venture or distribution deal, or IR/news stating it is diversifying
+    overseas markets. A job-board page is relevant ONLY if it is one specific
+    company's posting. Set is_relevant_buyer to TRUE for such a company, put the
+    company name in company_name, the signal in recent_signal, the target market
+    in country, and the industry in category. Set is_relevant_buyer to FALSE for:
+    search-result listings of many jobs or companies, recruiting agencies,
+    listicles, generic news roundups, blogs, wikis, and forums.
