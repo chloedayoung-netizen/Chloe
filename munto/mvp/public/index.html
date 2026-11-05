@@ -153,10 +153,12 @@ h1{font:700 28px/1.3 var(--f-display);margin:4px 0 0;text-wrap:balance}
   <h2 id="hoTitle">아직 결제를 받지 않아요</h2>
   <p>지금은 실험 기간이라 실제로 돈이 나가지 않아요. 골라 주신 선택은 가격을 정하는 데만 써요. 고마운 마음으로 오늘 10번을 더 열어 드릴게요.</p>
   <button class="btn" id="honestOk" type="button">계속 이야기하기</button>
+  <button class="btn ghost" id="payReal" type="button" hidden>실제로 1,900원 내 보기 (실험용 송금 · 요청하면 환불)</button>
 </div></div>
 
 <div class="sheet" id="feedback" hidden role="dialog" aria-labelledby="fbTitle"><div class="wrap">
   <h2 id="fbTitle">오늘 대화 어땠어요?</h2>
+  <button class="opt" id="remind" type="button"><span><b>내일 밤 9시에 알려 주세요</b><small>캘린더에 알림을 추가해요 · 연락처는 받지 않아요</small></span><span class="price">+ 캘린더</span></button>
   <div class="fb">
     <button class="btn ghost pick" type="button" data-score="up" aria-pressed="false">재밌었어요</button>
     <button class="btn ghost pick" type="button" data-score="down" aria-pressed="false">별로였어요</button>
@@ -192,7 +194,7 @@ h1{font:700 28px/1.3 var(--f-display);margin:4px 0 0;text-wrap:balance}
   }
 
   // ---------- 하루 사용량 ----------
-  let cfg = { freeTurns: 30, bonusTurns: 10 };
+  let cfg = { freeTurns: 30, bonusTurns: 10, payLink: "" };
   function day() {
     const d = store.get("day", null);
     if (!d || d.date !== today()) { const n = { date: today(), used: 0, bonus: 0 }; store.set("day", n); return n; }
@@ -204,8 +206,9 @@ h1{font:700 28px/1.3 var(--f-display);margin:4px 0 0;text-wrap:balance}
   const blank = () => ({ messages: [], bond: 0, memories: [], hook: "", hookShownOn: "", lastDate: "", days: [], nickname: "" });
   const stateOf = (id) => Object.assign(blank(), store.get("c:" + id, {}));
   const save = (id, s) => { s.messages = s.messages.slice(-60); s.memories = s.memories.slice(-12); store.set("c:" + id, s); };
-  const STAGES = [[0, "처음"], [15, "가까워짐"], [50, "단짝"]];
-  const stageName = (b) => STAGES.filter(([m]) => b >= m).pop()[1];
+  // 서버(characters.js)와 같은 기준: 메시지 수와 다시 온 날 수가 함께 차야 다음 단계
+  const STAGES = [[0, 1, "처음"], [20, 2, "가까워짐"], [60, 4, "단짝"]];
+  const stageName = (b, d) => STAGES.filter(([m, n]) => b >= m && Math.max(1, d) >= n).pop()[2];
 
   // ---------- 캐릭터 목록 ----------
   const FALLBACK = [
@@ -233,7 +236,7 @@ h1{font:700 28px/1.3 var(--f-display);margin:4px 0 0;text-wrap:balance}
       }
       if (s.days.length) {
         const m = document.createElement("span"); m.className = "meta";
-        m.textContent = `${stageName(s.bond)} · 함께한 날 ${s.days.length}일`; b.append(m);
+        m.textContent = `${stageName(s.bond, s.days.length)} · 함께한 날 ${s.days.length}일`; b.append(m);
       }
       b.addEventListener("click", () => openChat(c));
       box.append(b);
@@ -249,10 +252,10 @@ h1{font:700 28px/1.3 var(--f-display);margin:4px 0 0;text-wrap:balance}
   }
   function updateMeta() {
     const s = stateOf(current.id);
-    $("cStage").textContent = stageName(s.bond);
+    $("cStage").textContent = stageName(s.bond, s.days.length);
     const left = Math.max(0, limit() - day().used);
     $("left").textContent = `오늘 남은 대화 ${left}번`;
-    $("nick").hidden = s.bond < 15;
+    $("nick").hidden = stageName(s.bond, s.days.length) === "처음";
   }
 
   function openChat(c) {
@@ -296,7 +299,7 @@ h1{font:700 28px/1.3 var(--f-display);margin:4px 0 0;text-wrap:balance}
   function payloadFor(s, ending = false) {
     return {
       uid, sid, src, variant: PROMPT_VERSION, char: current.id, ending,
-      history: s.messages.slice(-20), bond: s.bond, memories: s.memories, nickname: s.nickname,
+      history: s.messages.slice(-20), bond: s.bond, days: Math.max(1, s.days.length), memories: s.memories, nickname: s.nickname,
       lastHook: s.hookShownOn === today() && !s.hookUsed ? s.hook : "",
     };
   }
@@ -345,6 +348,7 @@ h1{font:700 28px/1.3 var(--f-display);margin:4px 0 0;text-wrap:balance}
       t.remove(); bubble("ai", out.reply);
     } catch (e) { t.remove(); bubble("sys", e.message); }
     finally { busy = false; }
+    $("remind").querySelector("b").textContent = "내일 밤 9시에 알려 주세요";
     openSheet("feedback");
   }
 
@@ -362,6 +366,29 @@ h1{font:700 28px/1.3 var(--f-display);margin:4px 0 0;text-wrap:balance}
     openSheet("honest");
   }));
   $("honestOk").addEventListener("click", () => { closeSheets(); updateMeta(); });
+  $("payReal").addEventListener("click", () => {
+    track("pay_link_click", current.id, { turnToday: day().used });
+    window.open(cfg.payLink, "_blank", "noopener");
+  });
+
+  // 재방문 장치: 로그인·푸시 없이 캘린더 알림(.ics)으로 내일 다시 부른다. 개인정보를 받지 않는다.
+  $("remind").addEventListener("click", () => {
+    const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(21, 0, 0, 0);
+    const z = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    const end = new Date(t.getTime() + 15 * 60000);
+    const who = current ? current.name : "캐릭터";
+    const link = `${location.origin}/?src=remind`;
+    const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//character-chat-mvp//KO", "BEGIN:VEVENT",
+      `UID:${rid()}@character-chat-mvp`, `DTSTAMP:${z(new Date())}`, `DTSTART:${z(t)}`, `DTEND:${z(end)}`,
+      `SUMMARY:${josa(who, "이", "가")} 기다리는 중`, `DESCRIPTION:어제 남긴 이야기 이어서 하기 ${link}`, `URL:${link}`,
+      "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", `DESCRIPTION:${josa(who, "이", "가")} 기다리는 중`, "END:VALARM",
+      "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+    a.download = "tomorrow.ics"; document.body.append(a); a.click(); a.remove();
+    track("reminder_set", current ? current.id : "", { method: "ics" });
+    $("remind").querySelector("b").textContent = "캘린더 파일을 받았어요";
+  });
 
   let score = "";
   document.querySelectorAll("#feedback .pick").forEach((b) => b.addEventListener("click", () => {
@@ -394,12 +421,13 @@ h1{font:700 28px/1.3 var(--f-display);margin:4px 0 0;text-wrap:balance}
   $("ageOk").addEventListener("click", () => { store.set("age", true); track("age_ok"); showCards(); });
 
   (async () => {
-    track("visit", "", { returning: Boolean(store.get("seen", false)) });
+    track("visit", "", { returning: Boolean(store.get("seen", false)), entry: (qs.get("src") || "direct").slice(0, 30) });
     store.set("seen", true);
     if (!DEMO) {
       try { CHARS = await (await fetch("/api/characters")).json(); } catch {}
       try { cfg = await (await fetch("/api/config")).json(); } catch {}
     }
+    if (cfg.payLink) $("payReal").hidden = false;
     if (store.get("age", false)) showCards();
   })();
 })();

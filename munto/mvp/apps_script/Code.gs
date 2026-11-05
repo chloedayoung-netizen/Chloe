@@ -44,6 +44,7 @@ function summarize() {
   let costUsd = 0, costKnown = 0, replies = 0, safety = 0, errors = 0;
   const pay = { day: 0, month: 0, tomorrow: 0 }, paywallViews = new Set(), payUsers = new Set();
   const fb = { up: 0, down: 0 }, comments = [];
+  const reminders = new Set(), payClicks = new Set(), remindVisits = new Set();
 
   rows.forEach((e) => {
     const u = users[e.uid] || (users[e.uid] = { src: e.src, days: new Set(), msgs: 0, started: false, firstDay: null });
@@ -59,6 +60,9 @@ function summarize() {
       replies++;
       if (typeof e.data.costUsd === 'number') { costUsd += e.data.costUsd; costKnown++; }
     }
+    if (e.type === 'reminder_set') reminders.add(e.uid);
+    if (e.type === 'pay_link_click') payClicks.add(e.uid);
+    if (e.type === 'visit' && e.data.entry === 'remind') remindVisits.add(e.uid);
     if (e.type === 'safety_crisis') safety++;
     if (e.type === 'error') errors++;
     if (e.type === 'paywall_view') paywallViews.add(e.uid);
@@ -84,6 +88,9 @@ function summarize() {
     ['무료 한도 도달(결제창 본 사람)', paywallViews.size, pct(paywallViews.size, starters.length) + ' of 시작한 사람'],
     ['결제 의향 선택(하루/월)', pay.day + ' / ' + pay.month, '사람 수 ' + payUsers.size + ' · 실제 결제 아님'],
     ['내일 올게요 선택', pay.tomorrow, ''],
+    ['실제 송금 링크 누른 사람', payClicks.size, '실제 입금 건수는 송금 내역에서 따로 셈'],
+    ['캘린더 알림 받은 사람', reminders.size, pct(reminders.size, starters.length) + ' of 시작한 사람'],
+    ['알림 링크로 돌아온 사람', remindVisits.size, pct(remindVisits.size, reminders.size) + ' of 알림 받은 사람'],
     ['AI 응답 수', replies, ''],
     ['AI 비용 합계(USD)', Math.round(costUsd * 10000) / 10000, '비용 확인된 응답 ' + costKnown + '건'],
     ['사람-일 세션당 AI 비용(USD)', sessions ? Math.round(costUsd / sessions * 10000) / 10000 : '-', ''],

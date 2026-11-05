@@ -100,8 +100,10 @@ async function handleChat(req, env, ctx) {
 
   // 2) 모델 호출
   const bond = Math.max(0, Number(body.bond) || 0);
+  const days = Math.min(365, Math.max(1, Number(body.days) || 1));
   const system = buildSystemPrompt(ch, {
     bond,
+    days,
     memories: (Array.isArray(body.memories) ? body.memories : []).map((m) => clip(m, 80)),
     lastHook: clip(body.lastHook, 200),
     nickname: clip(body.nickname, 12),
@@ -125,7 +127,8 @@ async function handleChat(req, env, ctx) {
       ...base,
       type: ending ? "ai_goodbye" : "ai_reply",
       data: {
-        stage: stageFor(bond).name,
+        stage: stageFor(bond, days).name,
+        days,
         userLen: last && last.role === "user" ? last.content.length : 0,
         replyLen: text.length,
         memorySaved: Boolean(mem),
@@ -139,6 +142,7 @@ async function handleChat(req, env, ctx) {
 const ALLOWED_EVENTS = new Set([
   "visit", "age_ok", "char_open", "session_start", "user_msg", "end_click",
   "paywall_view", "paywall_choice", "feedback", "return_banner", "nickname_set",
+  "reminder_set", "pay_link_click",
 ]);
 
 async function handleEvent(req, env, ctx) {
@@ -155,7 +159,11 @@ export default {
     const url = new URL(req.url);
     if (url.pathname === "/api/characters") return json(publicList());
     if (url.pathname === "/api/config")
-      return json({ freeTurns: Number(env.FREE_TURNS_PER_DAY || 30), bonusTurns: Number(env.BONUS_TURNS || 10) });
+      return json({
+        freeTurns: Number(env.FREE_TURNS_PER_DAY || 30),
+        bonusTurns: Number(env.BONUS_TURNS || 10),
+        payLink: env.PAY_LINK || "", // 실제 소액 송금 링크(선택). 비어 있으면 결제 의향만 기록
+      });
     if (url.pathname === "/api/chat" && req.method === "POST") return handleChat(req, env, ctx);
     if (url.pathname === "/api/event" && req.method === "POST") return handleEvent(req, env, ctx);
     if (url.pathname.startsWith("/api/")) return json({ error: "not found" }, 404);
