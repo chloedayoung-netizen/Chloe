@@ -1,0 +1,49 @@
+/* 지원 서류 공통 — A4 인쇄용. MVP 화면과 같은 글꼴·색으로 묶는다. */
+@import url("https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap");
+:root{
+  --ink:#211F2A; --muted:#625E6E; --line:#DEDAE6; --soft:#F3F1F8; --accent:#3D3A8C;
+  --doyun:#2F6B66; --haru:#B4505F; --seojin:#7A6326; --fill:#B4505F;
+  --f-display:"Gowun Batang","Nanum Myeongjo",serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@page{size:A4;margin:14mm 15mm 14mm}
+*{box-sizing:border-box}
+html{background:#fff}
+body{margin:0;color:var(--ink);background:#fff;font:9.6pt/1.62 var(--f-body);-webkit-print-color-adjust:exact;print-color-adjust:exact;word-break:keep-all;overflow-wrap:anywhere}
+.page{max-width:180mm;margin:0 auto}
+.page + .page{break-before:page}
+@media screen{body{background:#ECEAF1;padding:24px 12px}.page{background:#fff;padding:14mm 15mm;margin-bottom:16px;box-shadow:0 2px 12px rgb(0 0 0 / .08)}}
+h1{font:700 22pt/1.2 var(--f-display);margin:0}
+h2{font:700 13.5pt/1.35 var(--f-display);margin:0 0 6px;text-wrap:balance}
+h3{font-size:10.2pt;margin:0 0 3px;font-weight:600}
+p{margin:0 0 6px}
+.muted{color:var(--muted)}
+.small{font-size:8.6pt}
+.eyebrow{font-size:8pt;letter-spacing:.08em;color:var(--muted)}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:1.5px solid var(--ink);padding-bottom:8px;margin-bottom:12px}
+.head .contact{text-align:right;font-size:8.6pt;color:var(--muted)}
+.thesis{font:400 12pt/1.55 var(--f-display);margin:0 0 12px}
+section{margin-bottom:12px}
+.sec-title{font-size:8.4pt;letter-spacing:.1em;color:var(--accent);font-weight:600;border-bottom:1px solid var(--line);padding-bottom:3px;margin-bottom:8px}
+.item{display:grid;grid-template-columns:27mm 1fr;gap:4px 10px;margin-bottom:9px;break-inside:avoid}
+.item .when{font-size:8.4pt;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:1px}
+.item ul{margin:2px 0 0;padding-left:14px}
+.item li{margin-bottom:2px}
+.role{color:var(--muted);font-size:8.8pt}
+b.k{color:var(--accent);font-weight:600}
+.fill{border:1px dashed var(--fill);color:var(--fill);border-radius:3px;padding:0 4px;font-size:.92em;white-space:normal}
+.check{border:1px dashed var(--muted);color:var(--muted);border-radius:3px;padding:0 4px;font-size:.88em}
+table{width:100%;border-collapse:collapse;font-size:8.8pt;margin:4px 0 8px;break-inside:avoid}
+th,td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
+th{font-weight:600;background:var(--soft)}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.box{background:var(--soft);border-radius:6px;padding:8px 10px;margin:6px 0 8px;break-inside:avoid}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.shots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}
+.shots figure{margin:0}
+.shots img{width:100%;aspect-ratio:9/12.5;object-fit:cover;object-position:top;border:1px solid var(--line);border-radius:6px;display:block}
+.shots figcaption{font-size:7.6pt;color:var(--muted);margin-top:2px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:8pt;color:var(--muted);margin-bottom:8px}
+.foot{font-size:7.8pt;color:var(--muted);border-top:1px solid var(--line);padding-top:4px;margin-top:8px}
+.qa h2{margin-top:2px}
+.qa p{font-size:10pt;line-height:1.75;margin-bottom:8px;text-indent:0}
